@@ -9,9 +9,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.post("/", (req, res) => {
-  webhookRouter(req.body);
+    console.log("Evento:", req.body?.event);
+    console.log("ID do card:", req.body?.data?.FIELDS?.ID);
+    webhookRouter(req.body);
 });
 
-app.listen(process.env.PORT || 3000, () => {
+app.listen(process.env.PORT, () => {
   console.log("Servidor iniciado");
 });
