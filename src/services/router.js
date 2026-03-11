@@ -1,6 +1,6 @@
 const dealUpdate = require("../automations/dealUpdate.js");
 const dealAdd = require("../automations/dealAdd.js");
-const dealDelete = require("./src/automations/dealDelete.js");
+const dealDelete = require("../automations/dealDelete.js");
 
 module.exports = function router(body) {
   const event = body.event;
