@@ -1,7 +1,7 @@
 const axios = require("axios");
 
 module.exports = async function dealUpdate(body) {
-    const dealId = body.FIELDS.ID;
+    const dealId = body.data.ID;
 
     axios.get(`${process.env.BITRIX_WEBHOOK}crm.deal.get?ID=${dealId}`)
         .then(response => {
