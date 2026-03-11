@@ -9,8 +9,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.post("/", (req, res) => {
-    console.log("Evento:", req.body?.event);
-    console.log("ID do card:", req.body?.data?.FIELDS?.ID);
+    // console.log("Evento:", req.body?.event);
+    // console.log("ID do card:", req.body?.data?.FIELDS?.ID);
     webhookRouter(req.body);
 });
 

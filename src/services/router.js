@@ -27,15 +27,15 @@ module.exports = function router(body) {
       dealDelete(body);
       break;
 // ==
-    case "ONCRMINVOICEUPDATE":
+    case "ONCRMDYNAMICITEMUPDATE":
       invoiceUpdate(body);
       break;
 
-    case "ONCRMINVOICEADD":
+    case "ONCRMDYNAMICITEMADD":
       invoiceAdd(body);
       break;
 
-    case "ONCRMINVOICEDELETE":
+    case "ONCRMDYNAMICITEMDELETE":
       invoiceDelete(body);
       break;
 // ==
