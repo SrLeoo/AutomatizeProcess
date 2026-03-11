@@ -19,13 +19,10 @@ app.get("/", (req, res) => {
 app.post("/", async (req, res) => {
   try {
     console.log("Novo webhook recebido do Bitrix");
-    console.log("Data:", new Date().toISOString());
-    console.log("Headers:", req.headers);
     console.log("Body:", JSON.stringify(req.body, null, 2));
 
     // Exemplos de campos que geralmente podem vir do Bitrix
     const event = req.body.event || null;
-    const auth = req.body.auth || null;
     const data = req.body.data || null;
     const ts = req.body.ts || null;
 
