@@ -1,6 +1,10 @@
-const dealUpdate = require("../automations/dealUpdate.js");
-const dealAdd = require("../automations/dealAdd.js");
-const dealDelete = require("../automations/dealDelete.js");
+const dealUpdate = require("../automations/deal/dealUpdate.js");
+const dealAdd = require("../automations/deal/dealAdd.js");
+const dealDelete = require("../automations/deal/dealDelete.js");
+
+const invoiceUpdate = require("../automations/invoice/invoiceUpdate.js");
+const invoiceAdd = require("../automations/invoice/invoiceAdd.js");
+const invoiceDelete = require("../automations/invoice/invoiceDelete.js");
 
 module.exports = function router(body) {
   const event = body.event;
@@ -9,6 +13,7 @@ module.exports = function router(body) {
 
   console.log("Evento recebido:", event);
 
+// Deal =========================================
   switch (event) {
     case "ONCRMDEALUPDATE":
       dealUpdate(body);
@@ -21,6 +26,20 @@ module.exports = function router(body) {
     case "ONCRMDEALDELETE":
       dealDelete(body);
       break;
+// Deal =========================================
+// Faturas ======================================
+    case "ONCRMINVOICEUPDATE":
+      invoiceUpdate(body);
+      break;
+
+    case "ONCRMINVOICEADD":
+      invoiceAdd(body);
+      break;
+
+    case "ONCRMINVOICEDELETE":
+      invoiceDelete(body);
+      break;
+// Faturas ======================================
 
     default:
       console.log("Evento não tratado:", event);

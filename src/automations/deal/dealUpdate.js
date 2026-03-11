@@ -1,5 +1,5 @@
 const axios = require("axios");
-const getDeal = require("../services/bitrix/getDeal");
+const getDeal = require("../../services/bitrix/getDeal");
 
 module.exports = function dealUpdate(body) {
     const dealId = body?.data?.FIELDS?.ID;
