@@ -13,7 +13,7 @@ module.exports = function router(body) {
 
   console.log("Evento recebido:", event);
 
-// Deal =========================================
+// ==
   switch (event) {
     case "ONCRMDEALUPDATE":
       dealUpdate(body);
@@ -26,8 +26,7 @@ module.exports = function router(body) {
     case "ONCRMDEALDELETE":
       dealDelete(body);
       break;
-// Deal =========================================
-// Faturas ======================================
+// ==
     case "ONCRMINVOICEUPDATE":
       invoiceUpdate(body);
       break;
@@ -39,7 +38,7 @@ module.exports = function router(body) {
     case "ONCRMINVOICEDELETE":
       invoiceDelete(body);
       break;
-// Faturas ======================================
+// ==
 
     default:
       console.log("Evento não tratado:", event);
