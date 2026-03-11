@@ -1,7 +1,25 @@
 const axios = require("axios");
 
 module.exports = async function dealUpdate(body) {
-    const dealId = body.data.ID;
+console.log("===== DEBUG DEAL ID =====");
+
+console.log("body:", body);
+
+console.log("body.data:", body?.data);
+
+console.log("body.data.FIELDS:", body?.data?.FIELDS);
+
+console.log("body.data.FIELDS.ID:", body?.data?.FIELDS?.ID);
+
+const dealId = body?.data?.FIELDS?.ID;
+
+if (!dealId) {
+  console.log("⚠️ DEAL ID NÃO VEIO NO WEBHOOK");
+} else {
+  console.log("✅ DEAL ID RECEBIDO:", dealId);
+}
+
+console.log("=========================");
 
     axios.get(`${process.env.BITRIX_WEBHOOK}crm.deal.get?ID=${dealId}`)
         .then(response => {
