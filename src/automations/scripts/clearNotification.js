@@ -7,7 +7,8 @@ async function clearNotifications() {
             `${process.env.BITRIX_WEBHOOK}im.notify.get`
         );
 
-        const notifications = listResponse.data.result || [];
+        const result = listResponse.data.result;
+        const notifications = result.notifications || [];
         console.log(`Encontradas ${notifications.length} notificações`);
 
         if (notifications.length === 0) {
