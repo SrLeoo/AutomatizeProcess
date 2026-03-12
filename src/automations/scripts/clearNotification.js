@@ -46,5 +46,3 @@ async function clearNotifications() {
 
 
 module.exports = clearNotifications;
-
-Ajuste
