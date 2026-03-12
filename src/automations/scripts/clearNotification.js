@@ -10,9 +10,6 @@ async function clearNotifications() {
         const result = listResponse.data.result;
         const notifications = result.notifications || [];
         // console.log(`Encontradas ${notifications.length} notificações`);
-        const userId = 1;
-        const message = `Encontradas ${notifications.length} notificações`;
-        await sendNotification(userId, message);
 
         if (notifications.length === 0) {
             const userId = 1;
