@@ -5,6 +5,5 @@ module.exports = async function dealAdd(body) {
     const message = "Novo negócio criado";
 
     await sendNotification(userId, message);
-    console.log("Fluxo de add");
     
 }

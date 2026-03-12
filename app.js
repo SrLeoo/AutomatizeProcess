@@ -14,6 +14,14 @@ app.post("/", (req, res) => {
     webhookRouter(req.body);
 });
 
+app.post("/clear-notification", async (req, res) => {
+
+    console.log("Endpoint clear-notification chamado");
+
+
+    // res.send("Notificações limpas com sucesso");
+});
+
 app.listen(process.env.PORT, () => {
   console.log("Servidor iniciado");
 });

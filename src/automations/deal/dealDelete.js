@@ -5,6 +5,5 @@ module.exports = async function dealDelete(body) {
     const message = "Negócio excluído";
 
     await sendNotification(userId, message);
-    console.log("Fluxo de delete");
     
 }
