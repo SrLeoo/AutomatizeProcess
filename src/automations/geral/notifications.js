@@ -12,5 +12,3 @@ async function sendNotification(userId, message = ""){
         return null;
     }
 }
-
-module.exports = sendNotification;

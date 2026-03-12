@@ -1,18 +1,24 @@
 const axios = require("axios");
+const sendNotification = require('../../automations/geral/notifications');
 
 async function clearNotifications() {
     try {
-        // 1. Lista todas as notificações do usuário
         const listResponse = await axios.get(
             `${process.env.BITRIX_WEBHOOK}im.notify.get`
         );
 
         const result = listResponse.data.result;
         const notifications = result.notifications || [];
-        console.log(`Encontradas ${notifications.length} notificações`);
+        // console.log(`Encontradas ${notifications.length} notificações`);
+        const userId = 1;
+        const message = `Encontradas ${notifications.length} notificações`;
+        await sendNotification(userId, message);
 
         if (notifications.length === 0) {
-            return { message: "Nenhuma notificação encontrada" };
+            const userId = 1;
+            const message = "Nenhuma notificação encontrada para deletar.";
+            await sendNotification(userId, message);
+            return;
         }
 
         // 2. Deleta todas por ID
@@ -23,10 +29,11 @@ async function clearNotifications() {
                 { ID: notif.id }
             );
             deletedCount++;
-            console.log(`Deletada ${deletedCount}: ID ${notif.id}`);
+            // console.log(`Deletada ${deletedCount}: ID ${notif.id}`);
         }
-
-        return { message: `Deletadas ${deletedCount} notificações` };
+        const userIdF = 1;
+        const messageF = `Deletadas ${deletedCount} notificações.`;
+        await sendNotification(userIdF, messageF);
 
     } catch (error) {
         console.error(
@@ -37,4 +44,7 @@ async function clearNotifications() {
     }
 }
 
+
 module.exports = clearNotifications;
+
+Ajuste
