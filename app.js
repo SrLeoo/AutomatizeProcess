@@ -14,12 +14,19 @@ app.post("/", (req, res) => {
     webhookRouter(req.body);
 });
 
-app.post("/clear-notification", async (req, res) => {
 
+const clearNotifications = require("./src/automations/scripts/clearNotification.js");
+
+app.post("/clear-notification", async (req, res) => {
     console.log("Endpoint clear-notification chamado");
 
+    const result = await clearNotifications();
 
-    // res.send("Notificações limpas com sucesso");
+    res.status(200).send({
+        success: true,
+        message: "Notificação removida com sucesso",
+        result
+    });
 });
 
 app.listen(process.env.PORT, () => {
