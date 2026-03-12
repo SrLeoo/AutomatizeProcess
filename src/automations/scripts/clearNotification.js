@@ -2,25 +2,22 @@ const axios = require("axios");
 
 async function clearNotifications() {
     try {
-
-        const response = await axios.post(
-            `${process.env.BITRIX_WEBHOOK}im.notify.delete`,
-            {
-                TAG: "SYSTEM_EVENT_42"
-            }
+        // 1. Lista todas as notificações do usuário
+        const listResponse = await axios.get(
+            `${process.env.BITRIX_WEBHOOK}im.notify.get`
         );
 
-        console.log("Notificação removida com TAG");
+        const notifications = listResponse.data.result || [];
+        console.log(`Encontradas ${notifications.length} notificações`);
 
-        return response.data;
-
+        if (notifications.length === 0) {
+            return { message: "Nenhuma notificação encontrada" };
+        }
     } catch (error) {
-
         console.error(
-            "Erro ao remover notificação:",
+            "Erro ao listar notificações:",
             error.response?.data || error.message
         );
-
         throw error;
     }
 }
