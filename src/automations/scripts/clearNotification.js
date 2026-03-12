@@ -7,8 +7,6 @@ async function clearNotifications() {
             `${process.env.BITRIX_WEBHOOK}im.notify.get`
         );
 
-        console.log("DEBUG - Resposta completa:", JSON.stringify(listResponse.data, null, 2)); // ← ADICIONADO pra debug
-
         const result = listResponse.data.result;
         const notifications = result.notifications || [];
         console.log(`Encontradas ${notifications.length} notificações`);
@@ -16,9 +14,23 @@ async function clearNotifications() {
         if (notifications.length === 0) {
             return { message: "Nenhuma notificação encontrada" };
         }
+
+        // 2. Deleta todas por ID
+        let deletedCount = 0;
+        for (const notif of notifications) {
+            await axios.post(
+                `${process.env.BITRIX_WEBHOOK}im.notify.delete`,
+                { ID: notif.id }
+            );
+            deletedCount++;
+            console.log(`Deletada ${deletedCount}: ID ${notif.id}`);
+        }
+
+        return { message: `Deletadas ${deletedCount} notificações` };
+
     } catch (error) {
         console.error(
-            "Erro ao listar notificações:",
+            "Erro ao limpar notificações:",
             error.response?.data || error.message
         );
         throw error;
