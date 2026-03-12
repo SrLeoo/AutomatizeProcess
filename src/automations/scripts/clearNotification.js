@@ -7,6 +7,8 @@ async function clearNotifications() {
             `${process.env.BITRIX_WEBHOOK}im.notify.get`
         );
 
+        console.log("DEBUG - Resposta completa:", JSON.stringify(listResponse.data, null, 2)); // ← ADICIONADO pra debug
+
         const result = listResponse.data.result;
         const notifications = result.notifications || [];
         console.log(`Encontradas ${notifications.length} notificações`);
