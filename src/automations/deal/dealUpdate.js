@@ -37,6 +37,7 @@ module.exports = async function dealUpdate(body) {
 
 // Automação: Somar em fatura o tempo do negócio
     if (map.stageId === "WON") {
+        console.log("Etapa do negócio:,", map.stageId);
         const userId = 1;
         const message = "Negócio Att na fase ganho";
 
