@@ -90,22 +90,29 @@ module.exports = async function dealUpdate(body) {
 
             const novoTempo = Number(invoiceEncontrada.tempo || 0) + tempoNegocio;
             const novosNegocios = [...negocios, Number(dealId)];
+            const valorHora = Number(mapCompany.valorHora || 0);
+            const novoOpportunity = (novoTempo / 60) * valorHora;
 
             await updateInvoice(invoiceEncontrada.id, {
                 ufCrm_SMART_INVOICE_1772718146: novoTempo,
-                ufCrm_SMART_INVOICE_1772717699: novosNegocios
+                ufCrm_SMART_INVOICE_1772717699: novosNegocios,
+                opportunity: novoOpportunity
             });
-            
+
             console.log("Fatura atualizada:", invoiceEncontrada.id);
             return;
         }
+
+        const valorHora = Number(mapCompany.valorHora || 0);
+        const opportunityInicial = (tempoNegocio / 60) * valorHora;
 
         const novaFatura = await createInvoice({
             title: `Fatura - ${mapCompany.title || mapCompany.companyTitle || "Empresa"}`,
             companyId: mapDeal.raw.COMPANY_ID,
             assignedById: executorId,
             dealId: dealId,
-            tempo: tempoNegocio
+            tempo: tempoNegocio,
+            opportunity: opportunityInicial
         });
 
         let faturasEmpresa = mapCompany?.UF_CRM_1773391522 || [];

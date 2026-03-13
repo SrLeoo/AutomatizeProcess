@@ -9,7 +9,7 @@ module.exports = function getCompany(companyId) {
             return {
                 id: companyData.ID,
                 title: companyData.TITLE,
-
+                valorHora: companyData.UF_CRM_1761548403458,
                 UF_CRM_1773391522: companyData.UF_CRM_1773391522, // Fatura em andamento
                 raw: companyData
             };

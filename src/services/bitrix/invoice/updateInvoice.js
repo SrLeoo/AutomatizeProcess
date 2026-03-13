@@ -6,7 +6,8 @@ module.exports = async function updateInvoice(invoiceId, fields) {
         id: Number(invoiceId),
         fields: {
             ufCrm_SMART_INVOICE_1772718146: fields.ufCrm_SMART_INVOICE_1772718146,
-            ufCrm_SMART_INVOICE_1772717699: fields.ufCrm_SMART_INVOICE_1772717699
+            ufCrm_SMART_INVOICE_1772717699: fields.ufCrm_SMART_INVOICE_1772717699,
+            opportunity: fields.opportunity
         }
     });
 };
