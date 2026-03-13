@@ -34,6 +34,8 @@ const statusReport = require("./src/automations/scripts/statusReport.js");
 app.post("/status-report", async (req, res) => {
     try {
         console.log("Endpoint status-report chamado");
+        console.log("Body recebido:", req.body);
+        console.log("Query recebida:", req.query);
 
         const invoiceId = req.body?.invoiceId || req.query?.invoiceId;
 
