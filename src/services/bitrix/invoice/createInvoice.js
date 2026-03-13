@@ -8,10 +8,10 @@ module.exports = async function createInvoice({ title, companyId, assignedById, 
             companyId: Number(companyId),
             assignedById: Number(assignedById),
             stageId: "DT31_3:N",
-            UF_CRM_SMART_INVOICE_1772717699: [Number(dealId)],
-            UF_CRM_SMART_INVOICE_1772718146: Number(tempo)
+            ufCrm_SMART_INVOICE_1772717699: [Number(dealId)],
+            ufCrm_SMART_INVOICE_1772718146: Number(tempo)
         }
     });
 
-    return response?.data?.result?.item;
+    return response?.data?.result?.item || response?.data?.result;
 };

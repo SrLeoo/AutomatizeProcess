@@ -92,10 +92,10 @@ module.exports = async function dealUpdate(body) {
             const novosNegocios = [...negocios, Number(dealId)];
 
             await updateInvoice(invoiceEncontrada.id, {
-                UF_CRM_SMART_INVOICE_1772718146: novoTempo,
-                UF_CRM_SMART_INVOICE_1772717699: novosNegocios
+                ufCrm_SMART_INVOICE_1772718146: novoTempo,
+                ufCrm_SMART_INVOICE_1772717699: novosNegocios
             });
-
+            
             console.log("Fatura atualizada:", invoiceEncontrada.id);
             return;
         }
