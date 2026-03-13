@@ -4,9 +4,7 @@ const sendNotification = require('../../automations/geral/notifications');
 
 module.exports = async function dealUpdate(body) {
     const dealId = body?.data?.FIELDS?.ID;
-    const dealStageId = body?.data?.FIELDS?.STAGE_ID;
     console.log("dealUpdate acionada para o negócio ID:", dealId);
-    console.log("Dados recebidos:", dealStageId);
 
     if (!dealId) {
         return;
@@ -38,7 +36,7 @@ module.exports = async function dealUpdate(body) {
     }
 
 // Automação: Somar em fatura o tempo do negócio
-    if (dealStageId === "WON") {
+    if (map.stageId === "WON") {
         const userId = 1;
         const message = "Negócio Att na fase ganho";
 
