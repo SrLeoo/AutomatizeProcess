@@ -7,33 +7,203 @@ const getCompany = require("../../services/bitrix/company/getCompany");
 
 function formatDate(date) {
     if (!date) return "-";
+
     const d = new Date(date);
+
+    if (Number.isNaN(d.getTime())) {
+        return "-";
+    }
+
     return d.toLocaleDateString("pt-BR");
 }
 
 function getPeriodo(date) {
+    if (!date) return "-";
+
     const d = new Date(date);
+
+    if (Number.isNaN(d.getTime())) {
+        return "-";
+    }
+
     const mes = d.toLocaleString("pt-BR", { month: "long" });
     const ano = d.getFullYear();
-    return `${mes}/${ano}`;
+
+    return `${mes.charAt(0).toUpperCase() + mes.slice(1)}/${ano}`;
 }
 
-function addHeader(doc, empresaNome) {
-    doc
-        .fontSize(16)
-        .fillColor("#333333")
-        .text(empresaNome, 50, 30);
+function formatHours(minutes) {
+    return `${(Number(minutes || 0) / 60).toFixed(2)} h`;
+}
+
+function drawHeader(doc, empresaNome) {
+    const pageWidth = doc.page.width;
+    const margin = 50;
 
     doc
-        .moveTo(50, 55)
-        .lineTo(550, 55)
-        .strokeColor("#cccccc")
+        .rect(0, 0, pageWidth, 95)
+        .fill("#0F172A");
+
+    doc
+        .fillColor("#FFFFFF")
+        .fontSize(22)
+        .font("Helvetica-Bold")
+        .text("Relatório de Horas", margin, 26, {
+            width: pageWidth - margin * 2,
+            align: "left"
+        });
+
+    doc
+        .fillColor("#CBD5E1")
+        .fontSize(11)
+        .font("Helvetica")
+        .text(empresaNome, margin, 58, {
+            width: pageWidth - margin * 2,
+            align: "left"
+        });
+
+    doc.y = 120;
+}
+
+function drawSummaryCard(doc, invoice, empresaNome, totalMinutos) {
+    const x = 50;
+    const y = doc.y;
+    const w = 495;
+    const h = 105;
+
+    doc
+        .roundedRect(x, y, w, h, 10)
+        .fill("#F8FAFC");
+
+    doc
+        .lineWidth(1)
+        .strokeColor("#E2E8F0")
+        .roundedRect(x, y, w, h, 10)
         .stroke();
+
+    doc
+        .fillColor("#0F172A")
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text("Resumo", x + 20, y + 15);
+
+    doc
+        .fillColor("#334155")
+        .font("Helvetica")
+        .fontSize(10)
+        .text(`Fatura ID: ${invoice.id}`, x + 20, y + 40)
+        .text(`Empresa: ${empresaNome}`, x + 20, y + 58)
+        .text(`Período: ${getPeriodo(invoice.createdTime)}`, x + 20, y + 76);
+
+    doc
+        .fillColor("#2563EB")
+        .font("Helvetica-Bold")
+        .fontSize(22)
+        .text(formatHours(totalMinutos), x + 325, y + 42, {
+            width: 150,
+            align: "right"
+        });
+
+    doc
+        .fillColor("#64748B")
+        .font("Helvetica")
+        .fontSize(10)
+        .text("Total de horas", x + 325, y + 72, {
+            width: 150,
+            align: "right"
+        });
+
+    doc.y = y + h + 25;
+}
+
+function drawTableHeader(doc, y) {
+    doc
+        .roundedRect(50, y, 495, 28, 6)
+        .fill("#2563EB");
+
+    doc
+        .fillColor("#FFFFFF")
+        .font("Helvetica-Bold")
+        .fontSize(10)
+        .text("Data", 65, y + 9, { width: 80 })
+        .text("Title", 155, y + 9, { width: 270 })
+        .text("Tempo", 445, y + 9, { width: 80, align: "right" });
+
+    return y + 40;
+}
+
+function drawRow(doc, item, y, index) {
+    const rowHeight = 42;
+    const bgColor = index % 2 === 0 ? "#F8FAFC" : "#EEF4FF";
+
+    doc
+        .roundedRect(50, y, 495, rowHeight, 6)
+        .fill(bgColor);
+
+    doc
+        .fillColor("#0F172A")
+        .font("Helvetica")
+        .fontSize(10)
+        .text(item.dataFormatada, 65, y + 14, { width: 80 })
+        .text(item.titulo, 155, y + 10, {
+            width: 270,
+            height: rowHeight - 8,
+            ellipsis: true
+        })
+        .text(`${item.tempo} min`, 445, y + 14, {
+            width: 80,
+            align: "right"
+        });
+
+    return y + rowHeight + 8;
+}
+
+function drawFooterTotal(doc, totalMinutos) {
+    doc.moveDown(1.5);
+
+    doc
+        .roundedRect(340, doc.y, 205, 52, 8)
+        .fill("#0F172A");
+
+    doc
+        .fillColor("#FFFFFF")
+        .font("Helvetica")
+        .fontSize(10)
+        .text("Total consolidado", 355, doc.y - 40, {
+            width: 170,
+            align: "right"
+        });
+
+    doc
+        .fillColor("#FFFFFF")
+        .font("Helvetica-Bold")
+        .fontSize(18)
+        .text(formatHours(totalMinutos), 355, doc.y - 18, {
+            width: 170,
+            align: "right"
+        });
+}
+
+async function addPdfCommentToInvoice(invoiceId, pdfBuffer) {
+    const base64 = pdfBuffer.toString("base64");
+
+    await axios.post(`${process.env.BITRIX_WEBHOOK}crm.timeline.comment.add`, {
+        fields: {
+            ENTITY_ID: Number(invoiceId),
+            ENTITY_TYPE: "SMART_INVOICE",
+            COMMENT: "📄 Relatório de horas gerado automaticamente.",
+            FILES: [
+                {
+                    name: `Relatorio_Horas_${invoiceId}.pdf`,
+                    content: base64
+                }
+            ]
+        }
+    });
 }
 
 module.exports = async function statusReport(invoiceId) {
     try {
-
         if (!invoiceId) {
             throw new Error("invoiceId não informado.");
         }
@@ -46,130 +216,80 @@ module.exports = async function statusReport(invoiceId) {
             company.companyTitle ||
             "Empresa";
 
-        const negocios = Array.isArray(invoice.negocios)
-            ? invoice.negocios
-            : [invoice.negocios];
+        let negocios = invoice.negocios || [];
 
-        let totalMinutos = 0;
+        if (!Array.isArray(negocios)) {
+            negocios = [negocios];
+        }
+
         const dados = [];
+        let totalMinutos = 0;
 
         for (const dealId of negocios) {
             const deal = await getDeal(dealId);
-
             const tempo = Number(deal.raw?.UF_CRM_1769023570 || 0);
 
+            console.log(`Atividade ID: ${deal.id} | Título: ${deal.title}`);
+
             dados.push({
-                id: dealId,
+                id: deal.id,
                 titulo: deal.title,
                 data: deal.raw?.DATE_CREATE,
-                fase: deal.stageId,
+                dataFormatada: formatDate(deal.raw?.DATE_CREATE),
                 tempo
             });
 
             totalMinutos += tempo;
         }
 
-        // ================= PDF =================
-
-        const doc = new PDFDocument({ margin: 50 });
+        const doc = new PDFDocument({
+            margin: 50,
+            size: "A4"
+        });
 
         const buffers = [];
-        doc.on("data", buffers.push.bind(buffers));
+        doc.on("data", chunk => buffers.push(chunk));
 
-        doc.on("pageAdded", () => {
-            addHeader(doc, empresaNome);
+        drawHeader(doc, empresaNome);
+        drawSummaryCard(doc, invoice, empresaNome, totalMinutos);
+
+        let currentY = drawTableHeader(doc, doc.y);
+
+        dados.forEach((item, index) => {
+            if (currentY > 740) {
+                doc.addPage();
+                drawHeader(doc, empresaNome);
+                currentY = drawTableHeader(doc, doc.y);
+            }
+
+            currentY = drawRow(doc, item, currentY, index);
         });
 
-        addHeader(doc, empresaNome);
-
-        doc.moveDown(2);
-
-        doc
-            .fontSize(22)
-            .fillColor("#000000")
-            .text("Relatório de Horas", {
-                align: "center"
-            });
-
-        doc.moveDown();
-
-        doc.fontSize(12).text(`Fatura ID: ${invoiceId}`);
-        doc.text(`Empresa: ${empresaNome}`);
-        doc.text(`Período: ${getPeriodo(invoice.createdTime)}`);
-
-        doc.moveDown(2);
-
-        // ====== tabela ======
-
-        doc
-            .fontSize(12)
-            .fillColor("#000000")
-            .text("ID", 50)
-            .text("Atividade", 100)
-            .text("Data", 300)
-            .text("Tempo", 380)
-            .text("Status", 450);
-
-        doc
-            .moveTo(50, doc.y + 5)
-            .lineTo(550, doc.y + 5)
-            .stroke();
-
-        doc.moveDown();
-
-        dados.forEach(item => {
-            doc
-                .fontSize(10)
-                .text(item.id, 50)
-                .text(item.titulo, 100, doc.y - 12, { width: 180 })
-                .text(formatDate(item.data), 300)
-                .text(`${item.tempo} min`, 380)
-                .text(item.fase, 450);
-
-            doc.moveDown();
-        });
-
-        doc.moveDown();
-
-        doc
-            .fontSize(14)
-            .fillColor("#000000")
-            .text(`Total de Horas: ${(totalMinutos / 60).toFixed(2)} h`, {
-                align: "right"
-            });
+        doc.y = currentY + 10;
+        drawFooterTotal(doc, totalMinutos);
 
         doc.end();
 
-        const pdfBuffer = await new Promise(resolve => {
-            doc.on("end", () => {
-                resolve(Buffer.concat(buffers));
-            });
+        const pdfBuffer = await new Promise((resolve, reject) => {
+            doc.on("end", () => resolve(Buffer.concat(buffers)));
+            doc.on("error", reject);
         });
 
-        const base64 = pdfBuffer.toString("base64");
+        await addPdfCommentToInvoice(invoice.id, pdfBuffer);
 
-        // ========= envia comentário =========
+        console.log("PDF gerado e anexado na fatura:", invoice.id);
 
-        await axios.post(`${process.env.BITRIX_WEBHOOK}crm.timeline.comment.add`, {
-            fields: {
-                ENTITY_ID: invoiceId,
-                ENTITY_TYPE: "SMART_INVOICE",
-                COMMENT: "📄 Relatório de horas gerado automaticamente.",
-                FILES: [
-                    {
-                        name: `Relatorio_Horas_${invoiceId}.pdf`,
-                        content: base64
-                    }
-                ]
-            }
-        });
-
-        console.log("PDF gerado e anexado na fatura:", invoiceId);
-
+        return {
+            invoiceId: invoice.id,
+            empresa: empresaNome,
+            totalAtividades: dados.length,
+            totalMinutos
+        };
     } catch (error) {
         console.error(
             "Erro ao gerar status report:",
             error.response?.data || error.message
         );
+        throw error;
     }
 };

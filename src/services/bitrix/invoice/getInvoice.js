@@ -20,6 +20,7 @@ module.exports = async function getInvoice(invoiceId) {
         stageId: invoiceData.stageId,
         assignedById: invoiceData.assignedById,
         companyId: invoiceData.companyId,
+        createdTime: invoiceData.createdTime,
         tempo: invoiceData.ufCrm_SMART_INVOICE_1772718146,
         negocios: invoiceData.ufCrm_SMART_INVOICE_1772717699,
         raw: invoiceData
