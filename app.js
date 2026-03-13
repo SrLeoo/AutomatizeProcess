@@ -33,10 +33,6 @@ const statusReport = require("./src/automations/scripts/statusReport.js");
 
 app.post("/status-report", async (req, res) => {
     try {
-        console.log("Endpoint status-report chamado");
-        console.log("Body recebido:", req.body);
-        console.log("Query recebida:", req.query);
-
         let invoiceId = req.body?.invoiceId || req.query?.invoiceId;
 
         if (!invoiceId && Array.isArray(req.body?.document_id)) {
@@ -46,8 +42,6 @@ app.post("/status-report", async (req, res) => {
                 invoiceId = String(smartInvoiceDocumentId).replace("SMART_INVOICE_", "");
             }
         }
-
-        console.log("invoiceId extraído:", invoiceId);
 
         const result = await statusReport(invoiceId);
 
