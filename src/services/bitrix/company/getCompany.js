@@ -6,11 +6,16 @@ module.exports = function getCompany(companyId) {
         .then(response => {
             const companyData = response.data.result;
 
+            const valorHoraBruto = companyData.UF_CRM_1761290484552;
+            const valorHora = valorHoraBruto
+                ? Number(String(valorHoraBruto).split("|")[0])
+                : 0;
+
             return {
                 id: companyData.ID,
                 title: companyData.TITLE,
-                valorHora: companyData.UF_CRM_1761548403458,
-                UF_CRM_1773391522: companyData.UF_CRM_1773391522, // Fatura em andamento
+                valorHora: valorHora,
+                UF_CRM_1773391522: companyData.UF_CRM_1773391522,
                 raw: companyData
             };
         });
