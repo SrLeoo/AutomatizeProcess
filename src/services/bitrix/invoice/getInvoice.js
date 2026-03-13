@@ -1,24 +1,27 @@
 const axios = require("axios");
 
 module.exports = async function getInvoice(invoiceId) {
+    if (Array.isArray(invoiceId)) {
+        invoiceId = invoiceId[0];
+    }
 
     invoiceId = Number(invoiceId);
 
-    const response = await axios.post(
-        `${process.env.BITRIX_WEBHOOK}crm.item.get`,
-        {
-            entityTypeId: 31,
-            id: invoiceId
-        }
-    );
+    const response = await axios.post(`${process.env.BITRIX_WEBHOOK}crm.item.get`, {
+        entityTypeId: 31,
+        id: invoiceId
+    });
 
-    const item = response?.data?.result?.item;
+    const invoiceData = response?.data?.result?.item;
 
     return {
-        id: item?.id,
-        title: item?.title,
-        opportunity: item?.opportunity,
-        stageId: item?.stageId,
-        raw: item
+        id: invoiceData.id,
+        title: invoiceData.title,
+        stageId: invoiceData.stageId,
+        assignedById: invoiceData.assignedById,
+        companyId: invoiceData.companyId,
+        tempo: invoiceData.UF_CRM_SMART_INVOICE_1772718146,
+        negocios: invoiceData.UF_CRM_SMART_INVOICE_1772717699,
+        raw: invoiceData
     };
 };
