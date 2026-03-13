@@ -2,18 +2,22 @@ const axios = require("axios");
 
 module.exports = function getInvoice(invoiceId) {
     return axios
-        .post(`${process.env.BITRIX_WEBHOOK}crm.item.get?id=${invoiceId}&entityTypeId=31`)
+        .post(`${process.env.BITRIX_WEBHOOK}crm.item.get`, {
+            entityTypeId: 31,
+            id: invoiceId
+        })
         .then(response => {
-            const invoiceData = response.data.result;
+
+            const invoiceData = response?.data?.result?.item;
 
             return {
-                id: invoiceData.ID,
-                title: invoiceData.TITLE,
-                opportunity: invoiceData.OPPORTUNITY,
-                ufCrm_SMART_INVOICE_1773172847829: invoiceData.UF_CRM_SMART_INVOICE_1773172847829, // Organização
-                
+                id: invoiceData.id,
+                title: invoiceData.title,
+                opportunity: invoiceData.opportunity,
+                ufCrm_SMART_INVOICE_1773172847829: invoiceData.ufCrm_SMART_INVOICE_1773172847829,
+                stageId: invoiceData.stageId,
+                raw: invoiceData
             };
-            
-        }
-    );
+
+        });
 };
