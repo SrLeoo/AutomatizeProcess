@@ -37,7 +37,17 @@ app.post("/status-report", async (req, res) => {
         console.log("Body recebido:", req.body);
         console.log("Query recebida:", req.query);
 
-        const invoiceId = req.body?.invoiceId || req.query?.invoiceId;
+        let invoiceId = req.body?.invoiceId || req.query?.invoiceId;
+
+        if (!invoiceId && Array.isArray(req.body?.document_id)) {
+            const smartInvoiceDocumentId = req.body.document_id[2];
+
+            if (smartInvoiceDocumentId) {
+                invoiceId = String(smartInvoiceDocumentId).replace("SMART_INVOICE_", "");
+            }
+        }
+
+        console.log("invoiceId extraído:", invoiceId);
 
         const result = await statusReport(invoiceId);
 
