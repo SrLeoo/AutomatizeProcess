@@ -7,10 +7,6 @@ const listInvoices = require("../../services/bitrix/invoice/listInvoices");
 module.exports = async function dealUpdate(body) {
     const dealId = body?.data?.FIELDS?.ID;
 
-    if (!dealId) {
-        return;
-    }
-
     // Busca dados
     const mapDeal = await getDeal(dealId);
     const mapCompany = await getCompany(mapDeal.raw.COMPANY_ID);
@@ -40,15 +36,41 @@ module.exports = async function dealUpdate(body) {
 
     // Automação: Somar em fatura o tempo do negócio
     if (mapDeal.stageId === "WON") {
-        const invoiceId = mapCompany?.UF_CRM_1773391522;
 
-        if (!invoiceId) {
+        let invoiceIds = mapCompany?.UF_CRM_1773391522;
+
+        if (!invoiceIds) {
             console.log("Empresa não possui vínculo com fatura");
             return;
         }
 
-        const invoice = await getInvoice(invoiceId);
+        // garante array
+        if (!Array.isArray(invoiceIds)) {
+            invoiceIds = [invoiceIds];
+        }
 
-        console.log("Nome da fatura vinculada:", invoice.title);
+        console.log("Faturas vinculadas:", invoiceIds);
+
+        let invoiceEncontrada = null;
+
+        for (const id of invoiceIds) {
+
+            const invoice = await getInvoice(id);
+
+            console.log("Verificando fatura:", invoice.id, invoice.stageId);
+
+            if (invoice.stageId === "DT31_3:N") {
+                invoiceEncontrada = invoice;
+                break;
+            }
+        }
+
+        if (!invoiceEncontrada) {
+            console.log("Nenhuma fatura encontrada na fase correta");
+            return;
+        }
+
+        console.log("Fatura correta:", invoiceEncontrada.title);
+
     }
 };
