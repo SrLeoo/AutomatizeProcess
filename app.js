@@ -29,6 +29,30 @@ app.post("/clear-notification", async (req, res) => {
     });
 });
 
+const statusReport = require("./src/automations/scripts/statusReport.js");
+
+app.post("/status-report", async (req, res) => {
+    try {
+        console.log("Endpoint status-report chamado");
+
+        const invoiceId = req.body?.invoiceId || req.query?.invoiceId;
+
+        const result = await statusReport(invoiceId);
+
+        res.status(200).send({
+            success: true,
+            message: "Status report gerado com sucesso",
+            result
+        });
+    } catch (error) {
+        res.status(500).send({
+            success: false,
+            message: "Erro ao gerar status report",
+            error: error.response?.data || error.message
+        });
+    }
+});
+
 app.listen(process.env.PORT, () => {
   console.log("Servidor iniciado");
 });
