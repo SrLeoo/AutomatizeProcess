@@ -104,6 +104,14 @@ function drawSummaryCard(doc, invoice, empresaNome, totalMinutos) {
             align: "right"
         });
 
+    doc
+        .fillColor("#64748B")
+        .font("Helvetica")
+        .fontSize(10)
+        .text("Total de horas", x + 325, y + 72, {
+            width: 150,
+            align: "right"
+        });
 
     doc.y = y + h + 25;
 }
@@ -148,32 +156,6 @@ function drawRow(doc, item, y, index) {
         });
 
     return y + rowHeight + 8;
-}
-
-function drawFooterTotal(doc, totalMinutos) {
-    doc.moveDown(1.5);
-
-    doc
-        .roundedRect(340, doc.y, 205, 52, 8)
-        .fill("#0F172A");
-
-    doc
-        .fillColor("#FFFFFF")
-        .font("Helvetica")
-        .fontSize(10)
-        .text("Total consolidado", 355, doc.y - 40, {
-            width: 170,
-            align: "right"
-        });
-
-    doc
-        .fillColor("#FFFFFF")
-        .font("Helvetica-Bold")
-        .fontSize(18)
-        .text(formatHours(totalMinutos), 355, doc.y - 18, {
-            width: 170,
-            align: "right"
-        });
 }
 
 async function addPdfCommentToInvoice(invoiceId, pdfBuffer) {
@@ -256,9 +238,6 @@ module.exports = async function statusReport(invoiceId) {
 
             currentY = drawRow(doc, item, currentY, index);
         });
-
-        doc.y = currentY + 10;
-        drawFooterTotal(doc, totalMinutos);
 
         doc.end();
 
