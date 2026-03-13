@@ -104,14 +104,6 @@ function drawSummaryCard(doc, invoice, empresaNome, totalMinutos) {
             align: "right"
         });
 
-    doc
-        .fillColor("#64748B")
-        .font("Helvetica")
-        .fontSize(10)
-        .text("Total de horas", x + 325, y + 72, {
-            width: 150,
-            align: "right"
-        });
 
     doc.y = y + h + 25;
 }
