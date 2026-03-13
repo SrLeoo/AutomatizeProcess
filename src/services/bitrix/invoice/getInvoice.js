@@ -1,8 +1,8 @@
 const axios = require("axios");
 
-module.exports = function invoiceUpdate(invoiceId) {
+module.exports = function getInvoice(invoiceId) {
     return axios
-        .get(`${process.env.BITRIX_WEBHOOK}crm.item.get?id=${invoiceId}&entityTypeId=31`)
+        .post(`${process.env.BITRIX_WEBHOOK}crm.item.get?id=${invoiceId}&entityTypeId=31`)
         .then(response => {
             const invoiceData = response.data.result;
 
@@ -10,7 +10,7 @@ module.exports = function invoiceUpdate(invoiceId) {
                 id: invoiceData.ID,
                 title: invoiceData.TITLE,
                 opportunity: invoiceData.OPPORTUNITY,
-                ufCrm_SMART_INVOICE_1773172847829: invoiceData.UF_CRM_SMART_INVOICE_1773172847829,
+                ufCrm_SMART_INVOICE_1773172847829: invoiceData.UF_CRM_SMART_INVOICE_1773172847829, // Organização
                 
             };
             
