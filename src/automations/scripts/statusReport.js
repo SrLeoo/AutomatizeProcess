@@ -1,158 +1,175 @@
 const axios = require("axios");
+const PDFDocument = require("pdfkit");
+
 const getInvoice = require("../../services/bitrix/invoice/getInvoice");
 const getDeal = require("../../services/bitrix/deal/getDeal");
+const getCompany = require("../../services/bitrix/company/getCompany");
 
-function sanitizePdfText(text) {
-    return String(text || "")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/\\/g, "\\\\")
-        .replace(/\(/g, "\\(")
-        .replace(/\)/g, "\\)")
-        .replace(/[^\x20-\x7E]/g, "");
+function formatDate(date) {
+    if (!date) return "-";
+    const d = new Date(date);
+    return d.toLocaleDateString("pt-BR");
 }
 
-function buildSimplePdf(lines) {
-    const safeLines = lines.map(sanitizePdfText);
-
-    let y = 800;
-    const lineHeight = 16;
-
-    const contentLines = [
-        "BT",
-        "/F1 12 Tf",
-        "50 800 Td"
-    ];
-
-    safeLines.forEach((line, index) => {
-        if (index === 0) {
-            contentLines.push(`(${line}) Tj`);
-        } else {
-            contentLines.push(`0 -${lineHeight} Td`);
-            contentLines.push(`(${line}) Tj`);
-        }
-        y -= lineHeight;
-    });
-
-    contentLines.push("ET");
-
-    const streamContent = contentLines.join("\n");
-    const streamLength = Buffer.byteLength(streamContent, "utf8");
-
-    const objects = [];
-
-    objects.push("1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj");
-    objects.push("2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj");
-    objects.push(
-        "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>\nendobj"
-    );
-    objects.push("4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj");
-    objects.push(
-        `5 0 obj\n<< /Length ${streamLength} >>\nstream\n${streamContent}\nendstream\nendobj`
-    );
-
-    let pdf = "%PDF-1.4\n";
-    const offsets = [0];
-
-    for (const obj of objects) {
-        offsets.push(Buffer.byteLength(pdf, "utf8"));
-        pdf += obj + "\n";
-    }
-
-    const xrefOffset = Buffer.byteLength(pdf, "utf8");
-
-    pdf += `xref
-0 ${objects.length + 1}
-0000000000 65535 f 
-`;
-
-    for (let i = 1; i < offsets.length; i++) {
-        pdf += `${String(offsets[i]).padStart(10, "0")} 00000 n \n`;
-    }
-
-    pdf += `trailer
-<< /Size ${objects.length + 1} /Root 1 0 R >>
-startxref
-${xrefOffset}
-%%EOF`;
-
-    return Buffer.from(pdf, "utf8");
+function getPeriodo(date) {
+    const d = new Date(date);
+    const mes = d.toLocaleString("pt-BR", { month: "long" });
+    const ano = d.getFullYear();
+    return `${mes}/${ano}`;
 }
 
-async function addPdfCommentToInvoice(invoiceId, fileName, pdfBuffer) {
-    const base64File = pdfBuffer.toString("base64");
+function addHeader(doc, empresaNome) {
+    doc
+        .fontSize(16)
+        .fillColor("#333333")
+        .text(empresaNome, 50, 30);
 
-    return axios.post(`${process.env.BITRIX_WEBHOOK}crm.timeline.comment.add`, {
-        fields: {
-            ENTITY_ID: Number(invoiceId),
-            ENTITY_TYPE: "DYNAMIC_31",
-            COMMENT: "Status report em PDF gerado automaticamente.",
-            FILES: [
-                [fileName, base64File]
-            ]
-        }
-    });
+    doc
+        .moveTo(50, 55)
+        .lineTo(550, 55)
+        .strokeColor("#cccccc")
+        .stroke();
 }
 
-async function statusReport(invoiceId) {
+module.exports = async function statusReport(invoiceId) {
     try {
+
         if (!invoiceId) {
             throw new Error("invoiceId não informado.");
         }
 
         const invoice = await getInvoice(invoiceId);
+        const company = await getCompany(invoice.companyId);
 
-        let negocios = invoice.negocios || [];
+        const empresaNome =
+            company.title ||
+            company.companyTitle ||
+            "Empresa";
 
-        if (!Array.isArray(negocios)) {
-            negocios = [negocios];
-        }
+        const negocios = Array.isArray(invoice.negocios)
+            ? invoice.negocios
+            : [invoice.negocios];
 
-        if (negocios.length === 0) {
-            console.log(`Fatura ${invoiceId} não possui atividades vinculadas.`);
-            return [];
-        }
-
-        const atividades = [];
+        let totalMinutos = 0;
+        const dados = [];
 
         for (const dealId of negocios) {
             const deal = await getDeal(dealId);
 
-            console.log(`Atividade ID: ${deal.id} | Título: ${deal.title}`);
+            const tempo = Number(deal.raw?.UF_CRM_1769023570 || 0);
 
-            atividades.push({
-                id: deal.id,
-                title: deal.title
+            dados.push({
+                id: dealId,
+                titulo: deal.title,
+                data: deal.raw?.DATE_CREATE,
+                fase: deal.stageId,
+                tempo
             });
+
+            totalMinutos += tempo;
         }
 
-        const linhasPdf = [
-            `Status Report - Fatura ${invoice.id}`,
-            `Titulo da Fatura: ${invoice.title}`,
-            `Data: ${new Date().toLocaleString("pt-BR")}`,
-            " ",
-            "Atividades:"
-        ];
+        // ================= PDF =================
 
-        for (const atividade of atividades) {
-            linhasPdf.push(`ID: ${atividade.id} | Titulo: ${atividade.title}`);
-        }
+        const doc = new PDFDocument({ margin: 50 });
 
-        const pdfBuffer = buildSimplePdf(linhasPdf);
-        const fileName = `status-report-fatura-${invoice.id}.pdf`;
+        const buffers = [];
+        doc.on("data", buffers.push.bind(buffers));
 
-        await addPdfCommentToInvoice(invoice.id, fileName, pdfBuffer);
+        doc.on("pageAdded", () => {
+            addHeader(doc, empresaNome);
+        });
 
-        console.log(`PDF gerado e anexado no comentário da fatura ${invoice.id}`);
+        addHeader(doc, empresaNome);
 
-        return atividades;
+        doc.moveDown(2);
+
+        doc
+            .fontSize(22)
+            .fillColor("#000000")
+            .text("Relatório de Horas", {
+                align: "center"
+            });
+
+        doc.moveDown();
+
+        doc.fontSize(12).text(`Fatura ID: ${invoiceId}`);
+        doc.text(`Empresa: ${empresaNome}`);
+        doc.text(`Período: ${getPeriodo(invoice.createdTime)}`);
+
+        doc.moveDown(2);
+
+        // ====== tabela ======
+
+        doc
+            .fontSize(12)
+            .fillColor("#000000")
+            .text("ID", 50)
+            .text("Atividade", 100)
+            .text("Data", 300)
+            .text("Tempo", 380)
+            .text("Status", 450);
+
+        doc
+            .moveTo(50, doc.y + 5)
+            .lineTo(550, doc.y + 5)
+            .stroke();
+
+        doc.moveDown();
+
+        dados.forEach(item => {
+            doc
+                .fontSize(10)
+                .text(item.id, 50)
+                .text(item.titulo, 100, doc.y - 12, { width: 180 })
+                .text(formatDate(item.data), 300)
+                .text(`${item.tempo} min`, 380)
+                .text(item.fase, 450);
+
+            doc.moveDown();
+        });
+
+        doc.moveDown();
+
+        doc
+            .fontSize(14)
+            .fillColor("#000000")
+            .text(`Total de Horas: ${(totalMinutos / 60).toFixed(2)} h`, {
+                align: "right"
+            });
+
+        doc.end();
+
+        const pdfBuffer = await new Promise(resolve => {
+            doc.on("end", () => {
+                resolve(Buffer.concat(buffers));
+            });
+        });
+
+        const base64 = pdfBuffer.toString("base64");
+
+        // ========= envia comentário =========
+
+        await axios.post(`${process.env.BITRIX_WEBHOOK}crm.timeline.comment.add`, {
+            fields: {
+                ENTITY_ID: invoiceId,
+                ENTITY_TYPE: "SMART_INVOICE",
+                COMMENT: "📄 Relatório de horas gerado automaticamente.",
+                FILES: [
+                    {
+                        name: `Relatorio_Horas_${invoiceId}.pdf`,
+                        content: base64
+                    }
+                ]
+            }
+        });
+
+        console.log("PDF gerado e anexado na fatura:", invoiceId);
+
     } catch (error) {
         console.error(
             "Erro ao gerar status report:",
             error.response?.data || error.message
         );
-        throw error;
     }
-}
-
-module.exports = statusReport;
+};
