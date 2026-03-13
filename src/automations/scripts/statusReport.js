@@ -36,13 +36,25 @@ function formatHours(minutes) {
     return `${(Number(minutes || 0) / 60).toFixed(2)} h`;
 }
 
-function drawHeader(doc, empresaNome) {
+function isValidHexColor(color) {
+    return /^#[0-9A-Fa-f]{6}$/.test(String(color || "").trim());
+}
+
+function getPrimaryColor(color) {
+    if (isValidHexColor(color)) {
+        return String(color).trim();
+    }
+
+    return "#2563EB";
+}
+
+function drawHeader(doc, empresaNome, primaryColor) {
     const pageWidth = doc.page.width;
     const margin = 50;
 
     doc
         .rect(0, 0, pageWidth, 95)
-        .fill("#0F172A");
+        .fill(primaryColor);
 
     doc
         .fillColor("#FFFFFF")
@@ -54,7 +66,7 @@ function drawHeader(doc, empresaNome) {
         });
 
     doc
-        .fillColor("#CBD5E1")
+        .fillColor("#EAF2FF")
         .fontSize(11)
         .font("Helvetica")
         .text(empresaNome, margin, 58, {
@@ -65,7 +77,7 @@ function drawHeader(doc, empresaNome) {
     doc.y = 120;
 }
 
-function drawSummaryCard(doc, invoice, empresaNome, totalMinutos) {
+function drawSummaryCard(doc, invoice, empresaNome, totalMinutos, primaryColor) {
     const x = 50;
     const y = doc.y;
     const w = 495;
@@ -96,7 +108,7 @@ function drawSummaryCard(doc, invoice, empresaNome, totalMinutos) {
         .text(`Período: ${getPeriodo(invoice.createdTime)}`, x + 20, y + 76);
 
     doc
-        .fillColor("#2563EB")
+        .fillColor(primaryColor)
         .font("Helvetica-Bold")
         .fontSize(22)
         .text(formatHours(totalMinutos), x + 325, y + 42, {
@@ -116,10 +128,10 @@ function drawSummaryCard(doc, invoice, empresaNome, totalMinutos) {
     doc.y = y + h + 25;
 }
 
-function drawTableHeader(doc, y) {
+function drawTableHeader(doc, y, primaryColor) {
     doc
         .roundedRect(50, y, 495, 28, 6)
-        .fill("#2563EB");
+        .fill(primaryColor);
 
     doc
         .fillColor("#FFFFFF")
@@ -190,6 +202,8 @@ module.exports = async function statusReport(invoiceId) {
             company.companyTitle ||
             "Empresa";
 
+        const primaryColor = getPrimaryColor(invoice.corPdf);
+
         let negocios = invoice.negocios || [];
 
         if (!Array.isArray(negocios)) {
@@ -224,16 +238,16 @@ module.exports = async function statusReport(invoiceId) {
         const buffers = [];
         doc.on("data", chunk => buffers.push(chunk));
 
-        drawHeader(doc, empresaNome);
-        drawSummaryCard(doc, invoice, empresaNome, totalMinutos);
+        drawHeader(doc, empresaNome, primaryColor);
+        drawSummaryCard(doc, invoice, empresaNome, totalMinutos, primaryColor);
 
-        let currentY = drawTableHeader(doc, doc.y);
+        let currentY = drawTableHeader(doc, doc.y, primaryColor);
 
         dados.forEach((item, index) => {
             if (currentY > 740) {
                 doc.addPage();
-                drawHeader(doc, empresaNome);
-                currentY = drawTableHeader(doc, doc.y);
+                drawHeader(doc, empresaNome, primaryColor);
+                currentY = drawTableHeader(doc, doc.y, primaryColor);
             }
 
             currentY = drawRow(doc, item, currentY, index);
@@ -254,7 +268,8 @@ module.exports = async function statusReport(invoiceId) {
             invoiceId: invoice.id,
             empresa: empresaNome,
             totalAtividades: dados.length,
-            totalMinutos
+            totalMinutos,
+            corAplicada: primaryColor
         };
     } catch (error) {
         console.error(

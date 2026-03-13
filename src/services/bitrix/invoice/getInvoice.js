@@ -23,6 +23,7 @@ module.exports = async function getInvoice(invoiceId) {
         createdTime: invoiceData.createdTime,
         tempo: invoiceData.ufCrm_SMART_INVOICE_1772718146,
         negocios: invoiceData.ufCrm_SMART_INVOICE_1772717699,
+        corPdf: invoiceData.ufCrm_SMART_INVOICE_1773404873927,
         raw: invoiceData
     };
 };
