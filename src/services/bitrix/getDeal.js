@@ -10,6 +10,7 @@ module.exports = function getDeal(dealId) {
                 id: dealData.ID,
                 title: dealData.TITLE,
                 stageId: dealData.STAGE_ID,
+                companyId: dealData.COMPANY_ID,
                 prioridade: dealData.UF_CRM_1761801450,
                 raw: dealData
             };

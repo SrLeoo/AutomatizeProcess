@@ -1,6 +1,6 @@
 const axios = require("axios");
 const getDeal = require("../../services/bitrix/getDeal");
-const sendNotification = require('../../automations/geral/notifications');
+const getCompany = require("../../services/bitrix/getCompany");
 
 module.exports = async function dealUpdate(body) {
     const dealId = body?.data?.FIELDS?.ID;
@@ -10,12 +10,14 @@ module.exports = async function dealUpdate(body) {
         return;
     }
 
-// Automação: Atualizar título do negócio com base na prioridade
-    const map = await getDeal(dealId);
+// Busca dados
+    const mapDeal = await getDeal(dealId);
+    const mapCompany = await getCompany(mapDeal.raw.COMPANY_ID);
 
-    if (map.prioridade === "185") {
-        if (!map.title.startsWith("♨️")) {
-            const updatedTitle = `♨️ ${map.title}`;
+// Automação: Atualizar título do negócio com base na prioridade
+    if (mapDeal.prioridade === "185") {
+        if (!mapDeal.title.startsWith("♨️")) {
+            const updatedTitle = `♨️ ${mapDeal.title}`;
             await axios.post(`${process.env.BITRIX_WEBHOOK}crm.deal.update`, {
                 id: dealId,
                 fields: {
@@ -24,8 +26,8 @@ module.exports = async function dealUpdate(body) {
             });
         }
     } else {
-        if (map.title.startsWith("♨️")) {
-            const updatedTitle = map.title.replace("♨️ ", "");
+        if (mapDeal.title.startsWith("♨️")) {
+            const updatedTitle = mapDeal.title.replace("♨️ ", "");
             await axios.post(`${process.env.BITRIX_WEBHOOK}crm.deal.update`, {
                 id: dealId,
                 fields: {
@@ -36,11 +38,7 @@ module.exports = async function dealUpdate(body) {
     }
 
 // Automação: Somar em fatura o tempo do negócio
-    if (map.stageId === "WON") {
-        console.log("Etapa do negócio:,", map.stageId);
-        const userId = 1;
-        const message = "Negócio Att na fase ganho";
-
-        await sendNotification(userId, message);
+    if (mapDeal.stageId === "WON") {
+        console.log("Titulo da empresa:", mapCompany.title);
     }
 };
