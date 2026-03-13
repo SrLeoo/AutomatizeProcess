@@ -5,6 +5,8 @@ const sendNotification = require('../../automations/geral/notifications');
 module.exports = async function dealUpdate(body) {
     const dealId = body?.data?.FIELDS?.ID;
     const dealStageId = body?.data?.FIELDS?.STAGE_ID;
+    console.log("dealUpdate acionada para o negócio ID:", dealId);
+    console.log("Dados recebidos:", dealStageId);
 
     if (!dealId) {
         return;
