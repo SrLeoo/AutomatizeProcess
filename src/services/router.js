@@ -6,6 +6,8 @@ const invoiceUpdate = require("../automations/invoice/invoiceUpdate.js");
 const invoiceAdd = require("../automations/invoice/invoiceAdd.js");
 const invoiceDelete = require("../automations/invoice/invoiceDelete.js");
 
+const timeLineCommentAdd = require("../automations/timelineComment/timeLineCommentAdd.js");
+
 module.exports = function router(body) {
   const event = body.event;
 
@@ -39,6 +41,9 @@ module.exports = function router(body) {
       invoiceDelete(body);
       break;
 // ==
+    case "ONCRMTIMELINECOMMENTADD":
+      timeLineCommentAdd(body);
+      break;
 
     default:
       console.log("Evento não tratado:", event);

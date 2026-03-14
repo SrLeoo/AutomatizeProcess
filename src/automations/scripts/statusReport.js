@@ -16,6 +16,7 @@ function formatDate(date) {
 
     return d.toLocaleDateString("pt-BR");
 }
+l
 
 function getPeriodo(date) {
     if (!date) return "-";

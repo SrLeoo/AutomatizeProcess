@@ -44,7 +44,7 @@ module.exports = async function dealUpdate(body) {
     if (mapDeal.stageId === "WON") {
 
         let invoiceIds = mapCompany?.UF_CRM_1773391522;
-        const executorId = Number(mapDeal.raw.UF_CRM_1761287067);
+        const executorId = Number(mapDeal.raw.UF_CRM_1773528146);
         const tempoNegocio = Number(mapDeal.raw.UF_CRM_1769023570 || 0);
 
         if (!invoiceIds) {
