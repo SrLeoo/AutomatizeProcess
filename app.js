@@ -29,7 +29,7 @@ app.post("/clear-notification", async (req, res) => {
     });
 });
 
-const statusReport = require("./src/automations/scripts/statusReport.js");
+const statusReport = require("./src/automations/scripts/statusReport/statusReport.js");
 
 app.post("/status-report", async (req, res) => {
     try {
