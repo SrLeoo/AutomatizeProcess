@@ -40,6 +40,22 @@ module.exports = async function dealUpdate(body) {
         }
     }
 
+    // Automação: Somar valor em negócio
+    async function atualizarTempoNegocio(dealId, mapDeal, mapCompany) {
+        const tempo = Number(mapDeal.raw.UF_CRM_1769023570 || 0);
+        const valorHora = Number(mapCompany.valorHora || 0);
+        
+        const novoValor = (tempo / 60) * valorHora;
+        console.log(`Deal ${dealId} - Tempo: ${tempo} minutos, Valor Hora: ${valorHora}, Novo Valor: ${novoValor}`);
+
+        await axios.post(`${process.env.BITRIX_WEBHOOK}crm.deal.update`, {
+            id: dealId,
+            fields: {
+                OPPORTUNITY: novoValor
+            }
+        });
+    }
+
     // Automação: Somar em fatura o tempo do negócio
     if (mapDeal.stageId === "WON") {
         let invoiceIds = mapCompany?.UF_CRM_1773391522;
