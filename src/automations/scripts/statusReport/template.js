@@ -44,9 +44,9 @@ function drawHeader(doc, empresaNome, primaryColor, invoiceId) {
         .rect(0, 0, pageWidth, 95)
         .fill(primaryColor);
 
-    // Título do relatório
+    // Título do relatório - CORRIGIDO: cor branca
     doc
-        .fillColor("#1E293B")
+        .fillColor("#FFFFFF")
         .fontSize(22)
         .font("Helvetica-Bold")
         .text("Relatório de Horas", margin, 26, {
@@ -54,9 +54,9 @@ function drawHeader(doc, empresaNome, primaryColor, invoiceId) {
             align: "left"
         });
 
-    // Nome da empresa
+    // Nome da empresa - CORRIGIDO: cor mais clara
     doc
-        .fillColor("#475569")
+        .fillColor("#E2E8F0")
         .fontSize(11)
         .font("Helvetica")
         .text(empresaNome, margin, 58, {
@@ -108,6 +108,7 @@ function drawSummaryCards(doc, invoice, totalMinutos, totalAtividades, valorDocu
 
     const mediaMinutos = totalAtividades > 0 ? totalMinutos / totalAtividades : 0;
 
+    // CORRIGIDO: Desenhar todos os cards na mesma altura Y
     drawCard(doc, startX, y, cardWidth, cardHeight);
     drawCard(doc, startX + cardWidth + gap, y, cardWidth, cardHeight);
     drawCard(doc, startX + (cardWidth + gap) * 2, y, cardWidth, cardHeight);
@@ -126,7 +127,7 @@ function drawSummaryCards(doc, invoice, totalMinutos, totalAtividades, valorDocu
         .text(getPeriodo(invoice.createdTime), startX + 15, y + 48)
         .text(`Emissão: ${new Date(invoice.createdTime).toLocaleDateString("pt-BR")}`, startX + 15, y + 70);
 
-    // Card 2 - Atividades (CORRIGIDO: alinhamento vertical)
+    // Card 2 - Atividades
     const card2X = startX + cardWidth + gap;
 
     doc
@@ -135,7 +136,7 @@ function drawSummaryCards(doc, invoice, totalMinutos, totalAtividades, valorDocu
         .fontSize(11)
         .text("Atividades", card2X + 15, y + 18);
 
-    // Linha 1: Total de atividades
+    // CORRIGIDO: Ajustar posições Y para alinhar com Card 1
     doc
         .fillColor("#1E293B")
         .font("Helvetica-Bold")
@@ -146,23 +147,21 @@ function drawSummaryCards(doc, invoice, totalMinutos, totalAtividades, valorDocu
         .fillColor("#475569")
         .text(" atividades");
 
-    // Linha 2: Média por atividade
     doc
         .fillColor("#1E293B")
         .font("Helvetica-Bold")
         .fontSize(16)
-        .text(`${formatHoursNumber(mediaMinutos)} h`, card2X + 15, y + 70, { continued: true })
+        .text(`${formatHoursNumber(mediaMinutos)} h`, card2X + 15, y + 68, { continued: true })
         .font("Helvetica")
         .fontSize(10)
         .fillColor("#475569")
         .text(" média por atividade");
 
-    // Linha 3: Total de horas
     doc
         .fillColor("#1E293B")
         .font("Helvetica-Bold")
         .fontSize(16)
-        .text(`${formatHoursNumber(totalMinutos)} h`, card2X + 15, y + 92, { continued: true })
+        .text(`${formatHoursNumber(totalMinutos)} h`, card2X + 15, y + 88, { continued: true })
         .font("Helvetica")
         .fontSize(10)
         .fillColor("#475569")
