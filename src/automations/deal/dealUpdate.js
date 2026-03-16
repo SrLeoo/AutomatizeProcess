@@ -120,7 +120,7 @@ module.exports = async function dealUpdate(body) {
             const novosNegocios = [...negocios, Number(dealId)];
             console.log("novosNegocios:", novosNegocios);
 
-            const valorHora = Number(mapCompany.UF_CRM_1772590183482 || 0);
+            const valorHora = Number(mapCompany.valorHora || 0);
             console.log("valorHora da empresa:", valorHora);
 
             const novoOpportunity = (novoTempo / 60) * valorHora;

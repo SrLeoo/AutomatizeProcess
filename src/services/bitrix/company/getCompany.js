@@ -19,7 +19,6 @@ module.exports = function getCompany(companyId) {
                 id: companyData.ID,
                 title: companyData.TITLE,
                 valorHora: valorHora,
-                UF_CRM_1772590183482: companyData.UF_CRM_1772590183482,
                 UF_CRM_1773391522: companyData.UF_CRM_1773391522,
                 raw: companyData
             };
