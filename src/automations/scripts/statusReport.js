@@ -5,6 +5,25 @@ const getInvoice = require("../../services/bitrix/invoice/getInvoice");
 const getDeal = require("../../services/bitrix/deal/getDeal");
 const getCompany = require("../../services/bitrix/company/getCompany");
 
+function parseBitrixMoney(value) {
+    if (!value) return 0;
+
+    if (typeof value === "number") return value;
+
+    if (typeof value === "string") {
+        return Number(value.split("|")[0]) || 0;
+    }
+
+    return 0;
+}
+
+function formatMoney(value) {
+    return new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+    }).format(Number(value || 0));
+}
+
 function formatDate(date) {
     if (!date) return "-";
 
@@ -77,11 +96,11 @@ function drawHeader(doc, empresaNome, primaryColor) {
     doc.y = 120;
 }
 
-function drawSummaryCard(doc, invoice, empresaNome, totalMinutos, primaryColor) {
+function drawSummaryCard(doc, invoice, empresaNome, totalMinutos, valorDocumento, primaryColor) {
     const x = 50;
     const y = doc.y;
     const w = 495;
-    const h = 105;
+    const h = 120;
 
     doc
         .roundedRect(x, y, w, h, 10)
@@ -107,11 +126,12 @@ function drawSummaryCard(doc, invoice, empresaNome, totalMinutos, primaryColor) 
         .text(`Empresa: ${empresaNome}`, x + 20, y + 58)
         .text(`Período: ${getPeriodo(invoice.createdTime)}`, x + 20, y + 76);
 
+    // TOTAL HORAS
     doc
         .fillColor(primaryColor)
         .font("Helvetica-Bold")
         .fontSize(22)
-        .text(formatHours(totalMinutos), x + 325, y + 42, {
+        .text(formatHours(totalMinutos), x + 325, y + 35, {
             width: 150,
             align: "right"
         });
@@ -120,7 +140,26 @@ function drawSummaryCard(doc, invoice, empresaNome, totalMinutos, primaryColor) 
         .fillColor("#64748B")
         .font("Helvetica")
         .fontSize(10)
-        .text("Total de horas", x + 325, y + 72, {
+        .text("Total de horas", x + 325, y + 60, {
+            width: 150,
+            align: "right"
+        });
+
+    // VALOR DOCUMENTO
+    doc
+        .fillColor("#16A34A")
+        .font("Helvetica-Bold")
+        .fontSize(20)
+        .text(formatMoney(valorDocumento), x + 325, y + 82, {
+            width: 150,
+            align: "right"
+        });
+
+    doc
+        .fillColor("#64748B")
+        .font("Helvetica")
+        .fontSize(10)
+        .text("Valor do documento", x + 325, y + 105, {
             width: 150,
             align: "right"
         });
@@ -195,6 +234,9 @@ module.exports = async function statusReport(invoiceId) {
         }
 
         const invoice = await getInvoice(invoiceId);
+        const valorDocumento = parseBitrixMoney(
+            invoice.raw?.OPPORTUNITY_WITH_CURRENCY
+        );
         const company = await getCompany(invoice.companyId);
 
         const empresaNome =
