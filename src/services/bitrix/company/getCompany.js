@@ -14,7 +14,7 @@ module.exports = function getCompany(companyId) {
             return {
                 id: companyData.ID,
                 title: companyData.TITLE,
-                valorHora: valorHora,
+                UF_CRM_1772590183482: valorHora,
                 UF_CRM_1773391522: companyData.UF_CRM_1773391522,
                 raw: companyData
             };
