@@ -108,7 +108,6 @@ function drawSummaryCards(doc, invoice, totalMinutos, totalAtividades, valorDocu
 
     const mediaMinutos = totalAtividades > 0 ? totalMinutos / totalAtividades : 0;
 
-    // CORRIGIDO: Desenhar todos os cards na mesma altura Y
     drawCard(doc, startX, y, cardWidth, cardHeight);
     drawCard(doc, startX + cardWidth + gap, y, cardWidth, cardHeight);
     drawCard(doc, startX + (cardWidth + gap) * 2, y, cardWidth, cardHeight);
@@ -127,7 +126,7 @@ function drawSummaryCards(doc, invoice, totalMinutos, totalAtividades, valorDocu
         .text(getPeriodo(invoice.createdTime), startX + 15, y + 48)
         .text(`Emissão: ${new Date(invoice.createdTime).toLocaleDateString("pt-BR")}`, startX + 15, y + 70);
 
-    // Card 2 - Atividades
+    // Card 2 - Atividades - CORRIGIDO: posições Y mais para baixo
     const card2X = startX + cardWidth + gap;
 
     doc
@@ -136,12 +135,12 @@ function drawSummaryCards(doc, invoice, totalMinutos, totalAtividades, valorDocu
         .fontSize(11)
         .text("Atividades", card2X + 15, y + 18);
 
-    // CORRIGIDO: Ajustar posições Y para alinhar com Card 1
+    // Ajustado: começando em y + 50 (mais para baixo)
     doc
         .fillColor("#1E293B")
         .font("Helvetica-Bold")
         .fontSize(16)
-        .text(`${totalAtividades}`, card2X + 15, y + 48, { continued: true })
+        .text(`${totalAtividades}`, card2X + 15, y + 50, { continued: true })
         .font("Helvetica")
         .fontSize(10)
         .fillColor("#475569")
@@ -151,7 +150,7 @@ function drawSummaryCards(doc, invoice, totalMinutos, totalAtividades, valorDocu
         .fillColor("#1E293B")
         .font("Helvetica-Bold")
         .fontSize(16)
-        .text(`${formatHoursNumber(mediaMinutos)} h`, card2X + 15, y + 68, { continued: true })
+        .text(`${formatHoursNumber(mediaMinutos)} h`, card2X + 15, y + 72, { continued: true })
         .font("Helvetica")
         .fontSize(10)
         .fillColor("#475569")
@@ -161,7 +160,7 @@ function drawSummaryCards(doc, invoice, totalMinutos, totalAtividades, valorDocu
         .fillColor("#1E293B")
         .font("Helvetica-Bold")
         .fontSize(16)
-        .text(`${formatHoursNumber(totalMinutos)} h`, card2X + 15, y + 88, { continued: true })
+        .text(`${formatHoursNumber(totalMinutos)} h`, card2X + 15, y + 94, { continued: true })
         .font("Helvetica")
         .fontSize(10)
         .fillColor("#475569")
@@ -190,7 +189,6 @@ function drawSummaryCards(doc, invoice, totalMinutos, totalAtividades, valorDocu
 
     doc.y = y + cardHeight + 25;
 }
-
 
 function drawTableHeader(doc, y, primaryColor) {
     doc
