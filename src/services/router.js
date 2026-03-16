@@ -6,8 +6,6 @@ const invoiceUpdate = require("../automations/invoice/invoiceUpdate.js");
 const invoiceAdd = require("../automations/invoice/invoiceAdd.js");
 const invoiceDelete = require("../automations/invoice/invoiceDelete.js");
 
-const timeLineCommentAdd = require("../automations/timelineComment/timeLineCommentAdd.js");
-
 module.exports = function router(body) {
   const event = body.event;
 
