@@ -43,9 +43,19 @@ function getPrimaryColor(color) {
 }
 
 async function addPdfCommentToInvoice(invoiceId, pdfBuffer) {
-    const base64 = pdfBuffer.toString("base64");
+    console.log("Iniciando addPdfCommentToInvoice para invoiceId:", invoiceId);
+    console.log("Tamanho do PDF buffer:", pdfBuffer.length, "bytes");
+    console.log("Tamanho estimado base64:", Math.round(pdfBuffer.length * 1.37 / 1024 / 1024), "MB");
 
-    await axios.post(`${process.env.BITRIX_WEBHOOK}crm.timeline.comment.add`, {
+    const base64 = pdfBuffer.toString("base64");
+    console.log("Base64 gerado, tamanho:", base64.length);
+
+    const webhookUrl = `${process.env.BITRIX_WEBHOOK}crm.timeline.comment.add`;
+    console.log("Webhook URL:", webhookUrl ? "OK (definida)" : "ERRO: Não definida!");
+    console.log("ENTITY_ID:", Number(invoiceId));
+    console.log("ENTITY_TYPE: SMART_INVOICE");
+
+    const payload = {
         fields: {
             ENTITY_ID: Number(invoiceId),
             ENTITY_TYPE: "SMART_INVOICE",
@@ -57,7 +67,22 @@ async function addPdfCommentToInvoice(invoiceId, pdfBuffer) {
                 }
             ]
         }
-    });
+    };
+
+    console.log("Enviando payload para Bitrix24...");
+
+    try {
+        const response = await axios.post(webhookUrl, payload);
+        console.log("RESPOSTA Bitrix24:", JSON.stringify(response.data, null, 2));
+    } catch (error) {
+        console.error("ERRO axios completo:", {
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+            data: error.response?.data,
+            message: error.message
+        });
+        throw error;
+    }
 }
 
 module.exports = async function statusReport(invoiceId) {
@@ -65,6 +90,8 @@ module.exports = async function statusReport(invoiceId) {
         if (!invoiceId) {
             throw new Error("invoiceId não informado.");
         }
+
+        console.log("Iniciando statusReport para invoiceId:", invoiceId);
 
         const invoice = await getInvoice(invoiceId);
         const company = await getCompany(invoice.companyId);
@@ -105,6 +132,8 @@ module.exports = async function statusReport(invoiceId) {
 
         const totalAtividades = dados.length;
 
+        console.log("PDF dados prontos:", { totalAtividades, totalMinutos });
+
         const pdfBuffer = await generateReportHoursPdf({
             invoice,
             empresaNome,
@@ -114,6 +143,8 @@ module.exports = async function statusReport(invoiceId) {
             valorDocumento,
             primaryColor
         });
+
+        console.log("PDF gerado, chamando addPdfCommentToInvoice...");
 
         await addPdfCommentToInvoice(invoice.id, pdfBuffer);
 
