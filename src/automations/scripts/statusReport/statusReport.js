@@ -1,8 +1,8 @@
 const axios = require("axios");
 
-const getInvoice = require("../../services/bitrix/invoice/getInvoice");
-const getDeal = require("../../services/bitrix/deal/getDeal");
-const getCompany = require("../../services/bitrix/company/getCompany");
+const getInvoice = require("../../../services/bitrix/invoice/getInvoice");
+const getDeal = require("../../../services/bitrix/deal/getDeal");
+const getCompany = require("../../../services/bitrix/company/getCompany");
 
 const generateReportHoursPdf = require("./template");
 
