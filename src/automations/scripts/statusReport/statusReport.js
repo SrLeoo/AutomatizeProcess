@@ -18,7 +18,6 @@ function formatDate(date) {
     return d.toLocaleDateString("pt-BR");
 }
 
-// ✅ REMOVIDO: função parseBitrixMoney (não precisa mais, opportunity já vem como número)
 
 function isValidHexColor(color) {
     return /^#[0-9A-Fa-f]{6}$/.test(String(color || "").trim());
@@ -66,12 +65,7 @@ module.exports = async function statusReport(invoiceId) {
 
         const primaryColor = getPrimaryColor(invoice.corPdf);
         
-        // ✅ MODIFICADO: Agora pega direto do invoice.opportunity (já vem como número)
         const valorDocumento = Number(invoice.opportunity || 0);
-
-        // ✅ ADICIONADO: Logs de debug
-        console.log("DEBUG invoice.opportunity:", invoice.opportunity);
-        console.log("DEBUG valorDocumento final:", valorDocumento);
 
         let negocios = invoice.negocios || [];
 
@@ -110,8 +104,6 @@ module.exports = async function statusReport(invoiceId) {
         });
 
         await addPdfCommentToInvoice(invoice.id, pdfBuffer);
-
-        console.log("PDF gerado e anexado na fatura:", invoice.id);
 
         return {
             invoiceId: invoice.id,
