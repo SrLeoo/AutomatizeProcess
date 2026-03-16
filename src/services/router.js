@@ -40,10 +40,6 @@ module.exports = function router(body) {
     case "ONCRMDYNAMICITEMDELETE":
       invoiceDelete(body);
       break;
-// ==
-    case "ONCRMTIMELINECOMMENTADD":
-      timeLineCommentAdd(body);
-      break;
 
     default:
       console.log("Evento não tratado:", event);
