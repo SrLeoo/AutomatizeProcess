@@ -34,43 +34,52 @@ function drawHeader(doc, empresaNome, primaryColor, invoiceId) {
     const pageWidth = doc.page.width;
     const margin = 50;
 
+    // Header background
     doc
         .rect(0, 0, pageWidth, 95)
         .fill(primaryColor);
 
+    // Título do relatório
     doc
-        .fillColor("#FFFFFF")
+        .fillColor("#1E293B")
         .fontSize(22)
         .font("Helvetica-Bold")
         .text("Relatório de Horas", margin, 26, {
-            width: pageWidth - margin * 2,
+            width: pageWidth - margin * 2 - 130,
             align: "left"
         });
 
+    // Nome da empresa
     doc
-        .fillColor("#EAF2FF")
+        .fillColor("#475569")
         .fontSize(11)
         .font("Helvetica")
         .text(empresaNome, margin, 58, {
-            width: pageWidth - margin * 2,
+            width: pageWidth - margin * 2 - 130,
             align: "left"
         });
 
+    // MODIFICADO: Badge da fatura - CORRIGIDO posicionamento
+    const badgeWidth = 110;
+    const badgeHeight = 38;
+    const badgeX = pageWidth - margin - badgeWidth; // CORREÇÃO: calcula posição direita corretamente
+    
     doc
-        .roundedRect(pageWidth - 160, 22, 110, 38, 8)
-        .fill("#FFFFFF20");
+        .roundedRect(badgeX, 22, badgeWidth, badgeHeight, 8)
+        .fill("#10B981");
 
     doc
         .fillColor("#FFFFFF")
         .fontSize(12)
         .font("Helvetica-Bold")
-        .text(`Fatura #${invoiceId}`, pageWidth - 148, 35, {
-            width: 86,
-            align: "left"
+        .text(`Fatura #${invoiceId}`, badgeX, 35, { // CORREÇÃO: usa badgeX calculado
+            width: badgeWidth,
+            align: "center" // CORREÇÃO: centraliza texto no badge
         });
 
     doc.y = 120;
 }
+
 
 function drawCard(doc, x, y, w, h) {
     doc

@@ -18,19 +18,7 @@ function formatDate(date) {
     return d.toLocaleDateString("pt-BR");
 }
 
-function parseBitrixMoney(value) {
-    if (!value) return 0;
-
-    if (typeof value === "number") return value;
-
-    if (typeof value === "string") {
-        // Tenta múltiplos formatos do Bitrix
-        const cleaned = value.toString().replace(/[^\d,.]/g, '');
-        return Number(cleaned.replace(',', '.')) || 0;
-    }
-
-    return 0;
-}
+// ✅ REMOVIDO: função parseBitrixMoney (não precisa mais, opportunity já vem como número)
 
 function isValidHexColor(color) {
     return /^#[0-9A-Fa-f]{6}$/.test(String(color || "").trim());
@@ -41,7 +29,7 @@ function getPrimaryColor(color) {
         return String(color).trim();
     }
 
-    return "#FFFFFF"; // Branco ao invés do azul feio
+    return "#FFFFFF";
 }
 
 async function addPdfCommentToInvoice(invoiceId, pdfBuffer) {
@@ -76,14 +64,13 @@ module.exports = async function statusReport(invoiceId) {
             company.companyTitle ||
             "Empresa";
 
-        const primaryColor = getPrimaryColor(invoice.corPdf); // Agora branco
-        const valorDocumento = parseBitrixMoney(
-            invoice.raw?.OPPORTUNITY_WITH_CURRENCY || 
-            invoice.raw?.OPPORTUNITY || 
-            0 // Fallback para 0 se não encontrar
-        );
+        const primaryColor = getPrimaryColor(invoice.corPdf);
+        
+        // ✅ MODIFICADO: Agora pega direto do invoice.opportunity (já vem como número)
+        const valorDocumento = Number(invoice.opportunity || 0);
 
-        console.log("DEBUG valorDocumento raw:", invoice.raw?.OPPORTUNITY_WITH_CURRENCY);
+        // ✅ ADICIONADO: Logs de debug
+        console.log("DEBUG invoice.opportunity:", invoice.opportunity);
         console.log("DEBUG valorDocumento final:", valorDocumento);
 
         let negocios = invoice.negocios || [];
