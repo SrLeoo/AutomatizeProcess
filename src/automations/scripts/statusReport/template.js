@@ -200,16 +200,16 @@ function drawTableHeader(doc, y, primaryColor) {
         .font("Helvetica-Bold")
         .fontSize(10)
         .text("Data", 65, y + 9, { width: 80 })
-        .text("Título", 155, y + 9, { width: 270 })
-        .text("Fase", 330, y + 9, { width: 120 })
-        .text("Tempo", 445, y + 9, { width: 80, align: "right" });
+        .text("Título", 155, y + 9, { width: 220 })
+        .text("Fase", 385, y + 9, { width: 80, align: "center" })
+        .text("Tempo", 465, y + 9, { width: 60, align: "right" });
 
     return y + 40;
 }
 
 
 function drawRow(doc, item, y, index) {
-    const rowHeight = 42;
+    const rowHeight = 54;
     const bgColor = index % 2 === 0 ? "#F8FAFC" : "#EEF4FF";
 
     doc
@@ -220,23 +220,33 @@ function drawRow(doc, item, y, index) {
         .fillColor("#0F172A")
         .font("Helvetica")
         .fontSize(10)
-        .text(item.dataFormatada, 65, y + 14, { width: 80 })
-        .text(item.titulo, 155, y + 10, {
-            width: 270,
-            height: rowHeight - 8,
-            ellipsis: true
-        })
-        .text(item.fase || "-", 330, y + 10, {
-            width: 120,
-            height: rowHeight - 8,
-            ellipsis: true
-        })
-        .text(`${item.tempo} min`, 445, y + 14, {
+        .text(item.dataFormatada || "-", 65, y + 18, {
             width: 80,
-            align: "right"
+            ellipsis: true
         });
 
-    return y + rowHeight + 8;
+    doc
+        .text(item.titulo || "-", 155, y + 10, {
+            width: 220,
+            height: 34,
+            ellipsis: true
+        });
+
+    doc
+        .text(item.fase || "-", 385, y + 18, {
+            width: 70,
+            align: "center",
+            ellipsis: true
+        })
+
+    doc
+        .text(`${item.tempo || 0} min`, 465, y + 18, {
+            width: 60,
+            align: "right",
+            ellipsis: true
+        });
+
+    return y + rowHeight + 10;
 }
 
 
