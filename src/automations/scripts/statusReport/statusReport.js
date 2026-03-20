@@ -85,7 +85,7 @@ module.exports = async function statusReport(invoiceId) {
                 titulo: deal.title,
                 data: deal.raw?.DATE_CREATE,
                 dataFormatada: formatDate(deal.raw?.DATE_CREATE),
-                fase: deal.stageId,
+                fase: deal.status,
                 tempo
             });
 
