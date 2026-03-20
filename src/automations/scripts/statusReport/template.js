@@ -68,7 +68,7 @@ function drawHeader(doc, empresaNome, primaryColor, invoiceId) {
     const badgeWidth = 110;
     const badgeHeight = 38;
     const badgeX = pageWidth - margin - badgeWidth;
-    
+
     doc
         .roundedRect(badgeX, 22, badgeWidth, badgeHeight, 8)
         .fill("#10B981");
@@ -201,6 +201,7 @@ function drawTableHeader(doc, y, primaryColor) {
         .fontSize(10)
         .text("Data", 65, y + 9, { width: 80 })
         .text("Título", 155, y + 9, { width: 270 })
+        .text("Fase", 330, y + 9, { width: 120 })
         .text("Tempo", 445, y + 9, { width: 80, align: "right" });
 
     return y + 40;
@@ -222,6 +223,11 @@ function drawRow(doc, item, y, index) {
         .text(item.dataFormatada, 65, y + 14, { width: 80 })
         .text(item.titulo, 155, y + 10, {
             width: 270,
+            height: rowHeight - 8,
+            ellipsis: true
+        })
+        .text(item.fase || "-", 330, y + 10, {
+            width: 120,
             height: rowHeight - 8,
             ellipsis: true
         })
