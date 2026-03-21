@@ -6,7 +6,7 @@ module.exports = async function quoteUpdate(body) {
     await sendNotification(userId, message);
 }
 
-module.exports = assync function quoteUpdate(body) {
+module.exports = async function quoteUpdate(body) {
     const quoteId = body?.data?.FIELDS?.ID;
 
     if (!quoteId) {
