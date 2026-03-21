@@ -1,4 +1,11 @@
+const axios = require("axios");
+
 const sendNotification = require('../../automations/geral/notifications');
+
+const getCompany = require("../../services/bitrix/company/getCompany");
+const getQuote = require("../../services/bitrix/quote/getQuote");
+
+
 
 module.exports = async function quoteUpdate(body) {
     const userId = 1;
