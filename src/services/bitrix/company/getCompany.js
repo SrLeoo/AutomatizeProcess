@@ -7,13 +7,13 @@ module.exports = function getCompany(companyId) {
             const companyData = response.data.result;
 
             const valorHoraBruto = companyData.UF_CRM_1772590183482;
-            console.log("valorHoraBruto da empresa:", valorHoraBruto);
-            console.log("companyData.UF_CRM_1772590183482:", companyData.UF_CRM_1772590183482);
+            // console.log("valorHoraBruto da empresa:", valorHoraBruto);
+            // console.log("companyData.UF_CRM_1772590183482:", companyData.UF_CRM_1772590183482);
 
             const valorHora = valorHoraBruto
                 ? Number(String(valorHoraBruto).split("|")[0])
                 : 0;
-            console.log("valorHora processado da empresa:", valorHora);
+            // console.log("valorHora processado da empresa:", valorHora);
 
             return {
                 id: companyData.ID,
