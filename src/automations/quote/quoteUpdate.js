@@ -49,7 +49,7 @@ module.exports = async function quoteUpdate(body) {
         await axios.post(`${process.env.BITRIX_WEBHOOK}crm.quote.update`, {
             id: quoteId,
             fields: {
-                [fieldToUpdate]: currentTime(now)
+                [fieldToUpdate]: currentTime()
             }
         });
     }
