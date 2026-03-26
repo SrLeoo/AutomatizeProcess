@@ -7,7 +7,8 @@ module.exports = async function quoteAdd(body) {
     const quoteId = body?.data?.FIELDS?.ID;
 
     const mapQuote = await getQuote(quoteId);
-   if (!mapQuote.raw.UF_CRM_QUOTE_1774523353129) {
+
+   if (!mapQuote.raw.UF_CRM_QUOTE_1774540648) {
         const currentTime = currentTime();
         await axios.post(`${process.env.BITRIX_WEBHOOK}crm.quote.update`, {
             id: quoteId,
