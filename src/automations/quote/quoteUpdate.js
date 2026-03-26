@@ -49,7 +49,7 @@ module.exports = async function quoteUpdate(body) {
         fieldToUpdate = "UF_CRM_QUOTE_1774540734"; // Aceito
     }
 
-    if (mapQuote.status_id === "DECLINED" && !mapQuote.recusado) {
+    if (mapQuote.status_id === "DECLAINED" && !mapQuote.recusado) {
         fieldToUpdate = "UF_CRM_QUOTE_1774540714"; // Recusado
     }
 
