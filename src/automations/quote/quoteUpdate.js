@@ -29,26 +29,27 @@ module.exports = async function quoteUpdate(body) {
 
     let fieldToUpdate;
     // logs para debug
+    console.log("Quote ID:", quoteId);
+    console.log("stage atual:", mapQuote.status_id);
     console.log("devolutivaFeita:", mapQuote.devolutivaFeita);
     console.log("aguardandoAssinatura:", mapQuote.aguardandoAssinatura);
     console.log("aceito:", mapQuote.aceito);
     console.log("recusado:", mapQuote.recusado);
-    console.log("stage atual:", mapQuote.stageId);
-    // 
+    //
 
-    if (mapQuote.stageId === "SENT" && !mapQuote.devolutivaFeita) {
+    if (mapQuote.status_id === "SENT" && !mapQuote.devolutivaFeita) {
         fieldToUpdate = "UF_CRM_QUOTE_1774523375059"; // Devolutiva feita
     }
 
-    if (mapQuote.stageId === "UC_34LZB3" && !mapQuote.aguardandoAssinatura) {
+    if (mapQuote.status_id === "UC_34LZB3" && !mapQuote.aguardandoAssinatura) {
         fieldToUpdate = "UF_CRM_QUOTE_1774523404427"; // Aguardando assinatura
     }
 
-    if (mapQuote.stageId === "APPROVED" && !mapQuote.aceito) {
+    if (mapQuote.status_id === "APPROVED" && !mapQuote.aceito) {
         fieldToUpdate = "UF_CRM_QUOTE_1774523551749"; // Aceito
     }
 
-    if (mapQuote.stageId === "DECLINED" && !mapQuote.recusado) {
+    if (mapQuote.status_id === "DECLINED" && !mapQuote.recusado) {
         fieldToUpdate = "UF_CRM_QUOTE_1774523541655"; // Recusado
     }
 
