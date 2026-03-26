@@ -6,7 +6,7 @@ async function sendNotification(userId, message = ""){
             "USER_ID": userId,
             "MESSAGE": message
         });
-        // console.log("Notificação enviada:", response.data);
+
     } catch (error) {
         console.error("Erro ao enviar notificação:", error);
         return null;

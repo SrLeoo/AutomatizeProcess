@@ -1,30 +1,16 @@
 const axios = require("axios");
-
 const sendNotification = require('../../automations/geral/notifications');
-
 const getCompany = require("../../services/bitrix/company/getCompany");
 const getQuote = require("../../services/bitrix/quote/getQuote");
-
-
-
-module.exports = async function quoteUpdate(body) {
-    const userId = 1;
-    const message = "Cotação atualizada";
-    await sendNotification(userId, message);
-}
+const currentTime = require('../../automations/geral/currentTime');
 
 module.exports = async function quoteUpdate(body) {
     const quoteId = body?.data?.FIELDS?.ID;
-
-    if (!quoteId) {
-        return;
-    }
-
-    // Busca dados
+    // Busca dados empresa
     const mapQuote = await getQuote(quoteId);
     const mapCompany = await getCompany(mapQuote.raw.COMPANY_ID);
 
-// Atualizar montante com base no valor da hora da empresa e o tempo do negócio
+    // Atualizar montante com base no valor da hora da empresa e o tempo do negócio
     const tempo = Number(mapQuote.raw.UF_CRM_1773953900);
     const valorHora = Number(mapCompany.valorHora);
     if (tempo > 0 && valorHora > 0) {
@@ -37,5 +23,34 @@ module.exports = async function quoteUpdate(body) {
             }
         });
     }
-}
 
+    // Setar data de entrada da fase
+    // DRAFT seria a primeira fase. Está em quoteAdd.js para garantir que seja setada na criação da cotação
+
+    let fieldToUpdate;
+
+    if (mapQuote.stageId === "SENT" && !mapQuote.devolutivaFeita) {
+        fieldToUpdate = "UF_CRM_QUOTE_1774523375059"; // Devolutiva feita
+    }
+
+    if (mapQuote.stageId === "UC_34LZB3" && !mapQuote.aguardandoAssinatura) {
+        fieldToUpdate = "UF_CRM_QUOTE_1774523404427"; // Aguardando assinatura
+    }
+
+    if (mapQuote.stageId === "APPROVED" && !mapQuote.aceito) {
+        fieldToUpdate = "UF_CRM_QUOTE_1774523551749"; // Aceito
+    }
+
+    if (mapQuote.stageId === "DECLINED" && !mapQuote.recusado) {
+        fieldToUpdate = "UF_CRM_QUOTE_1774523541655"; // Recusado
+    }
+
+    if (fieldToUpdate) {
+        await axios.post(`${process.env.BITRIX_WEBHOOK}crm.quote.update`, {
+            id: quoteId,
+            fields: {
+                [fieldToUpdate]: currentTime()
+            }
+        });
+    }
+};

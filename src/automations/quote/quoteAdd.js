@@ -1,8 +1,20 @@
-const sendNotification = require('../../automations/geral/notifications');
+const axios = require("axios");
+// const notification = require('../../automations/geral/notifications');
+const getQuote = require("../../services/bitrix/quote/getQuote");
+const currentTime = require('../../automations/geral/currentTime');
 
 module.exports = async function quoteAdd(body) {
-    const userId = 1;
-    const message = "Nova cotação criada";
-    await sendNotification(userId, message);
+    const quoteId = body?.data?.FIELDS?.ID;
+
+    const mapQuote = await getQuote(quoteId);
+   if (!mapQuote.raw.UF_CRM_QUOTE_1774523353129) {
+        const currentTime = currentTime();
+        await axios.post(`${process.env.BITRIX_WEBHOOK}crm.quote.update`, {
+            id: quoteId,
+            fields: {
+                UF_CRM_QUOTE_1774523353129: currentTime
+            }
+        });
+    }
 
 }
