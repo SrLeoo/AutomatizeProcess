@@ -28,6 +28,13 @@ module.exports = async function quoteUpdate(body) {
     // DRAFT seria a primeira fase. Está em quoteAdd.js para garantir que seja setada na criação da cotação
 
     let fieldToUpdate;
+    // logs para debug
+    console.log("devolutivaFeita:", mapQuote.devolutivaFeita);
+    console.log("aguardandoAssinatura:", mapQuote.aguardandoAssinatura);
+    console.log("aceito:", mapQuote.aceito);
+    console.log("recusado:", mapQuote.recusado);
+    console.log("stage atual:", mapQuote.stageId);
+    // 
 
     if (mapQuote.stageId === "SENT" && !mapQuote.devolutivaFeita) {
         fieldToUpdate = "UF_CRM_QUOTE_1774523375059"; // Devolutiva feita
