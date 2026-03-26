@@ -38,19 +38,19 @@ module.exports = async function quoteUpdate(body) {
     //
 
     if (mapQuote.status_id === "SENT" && !mapQuote.devolutivaFeita) {
-        fieldToUpdate = "UF_CRM_QUOTE_1774523375059"; // Devolutiva feita
+        fieldToUpdate = "UF_CRM_QUOTE_1774540686"; // Devolutiva feita
     }
 
     if (mapQuote.status_id === "UC_34LZB3" && !mapQuote.aguardandoAssinatura) {
-        fieldToUpdate = "UF_CRM_QUOTE_1774523404427"; // Aguardando assinatura
+        fieldToUpdate = "UF_CRM_QUOTE_1774540703"; // Aguardando assinatura
     }
 
     if (mapQuote.status_id === "APPROVED" && !mapQuote.aceito) {
-        fieldToUpdate = "UF_CRM_QUOTE_1774523551749"; // Aceito
+        fieldToUpdate = "UF_CRM_QUOTE_1774540734"; // Aceito
     }
 
     if (mapQuote.status_id === "DECLINED" && !mapQuote.recusado) {
-        fieldToUpdate = "UF_CRM_QUOTE_1774523541655"; // Recusado
+        fieldToUpdate = "UF_CRM_QUOTE_1774540714"; // Recusado
     }
 
     if (fieldToUpdate) {

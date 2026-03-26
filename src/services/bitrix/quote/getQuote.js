@@ -15,11 +15,11 @@ module.exports = function getQuote(quoteId) {
                 linkTranscricao: quoteData.UF_CRM_1773953560,
 
                 // Entrada na fase
-                aguardandoRetorno: quoteData.UF_CRM_QUOTE_1774523353129, // Aguardando retorno
-                devolutivaFeita: quoteData.UF_CRM_QUOTE_1774523375059, // Devolutiva feita
-                aguardandoAssinatura: quoteData.UF_CRM_QUOTE_1774523404427, // Aguardando assinatura
-                recusado: quoteData.UF_CRM_QUOTE_1774523541655, // Recusado
-                aceito: quoteData.UF_CRM_QUOTE_1774523551749,   // Aceito
+                aguardandoRetorno: quoteData.UF_CRM_QUOTE_1774540648, // Aguardando retorno
+                devolutivaFeita: quoteData.UF_CRM_QUOTE_1774540686, // Devolutiva feita
+                aguardandoAssinatura: quoteData.UF_CRM_QUOTE_1774540703, // Aguardando assinatura
+                recusado: quoteData.UF_CRM_QUOTE_1774540714, // Recusado
+                aceito: quoteData.UF_CRM_QUOTE_1774540734,   // Aceito
                 //
                 raw: quoteData
             };
