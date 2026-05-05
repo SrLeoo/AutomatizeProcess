@@ -4,7 +4,7 @@ const getInvoice = require("../../../services/bitrix/invoice/getInvoice");
 const getDeal = require("../../../services/bitrix/deal/getDeal");
 const getCompany = require("../../../services/bitrix/company/getCompany");
 
-const generateReportHoursPdf = require("./finance/template");
+const generateReportHoursPdf = require("./template");
 
 function formatDate(date) {
     if (!date) return "-";
