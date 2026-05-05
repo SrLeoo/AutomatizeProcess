@@ -1,6 +1,5 @@
 const PDFDocument = require("pdfkit");
 
-
 function getPeriodo(date) {
     if (!date) return "-";
 
@@ -16,16 +15,13 @@ function getPeriodo(date) {
     return `${mes.charAt(0).toUpperCase() + mes.slice(1)}/${ano}`;
 }
 
-
 function formatHours(minutes) {
     return `${(Number(minutes || 0) / 60).toFixed(2)} h`;
 }
 
-
 function formatHoursNumber(minutes) {
     return (Number(minutes || 0) / 60).toFixed(2);
 }
-
 
 function formatMoney(value) {
     return new Intl.NumberFormat("pt-BR", {
@@ -34,17 +30,14 @@ function formatMoney(value) {
     }).format(Number(value || 0));
 }
 
-
 function drawHeader(doc, empresaNome, primaryColor, invoiceId) {
     const pageWidth = doc.page.width;
     const margin = 50;
 
-    // Header background
     doc
         .rect(0, 0, pageWidth, 95)
         .fill(primaryColor);
 
-    // Título do relatório - CORRIGIDO: cor branca
     doc
         .fillColor("#FFFFFF")
         .fontSize(22)
@@ -54,7 +47,6 @@ function drawHeader(doc, empresaNome, primaryColor, invoiceId) {
             align: "left"
         });
 
-    // Nome da empresa - CORRIGIDO: cor mais clara
     doc
         .fillColor("#E2E8F0")
         .fontSize(11)
@@ -64,7 +56,6 @@ function drawHeader(doc, empresaNome, primaryColor, invoiceId) {
             align: "left"
         });
 
-    // Badge da fatura
     const badgeWidth = 110;
     const badgeHeight = 38;
     const badgeX = pageWidth - margin - badgeWidth;
@@ -85,7 +76,6 @@ function drawHeader(doc, empresaNome, primaryColor, invoiceId) {
     doc.y = 120;
 }
 
-
 function drawCard(doc, x, y, w, h) {
     doc
         .roundedRect(x, y, w, h, 10)
@@ -98,49 +88,51 @@ function drawCard(doc, x, y, w, h) {
         .stroke();
 }
 
-
-function drawSummaryCards(doc, invoice, totalMinutos, totalAtividades, valorDocumento) {
-    const startX = 50;
+function drawSummaryCards(doc, invoice, totalMinutos, totalAtividades) {
+    const pageWidth = doc.page.width;
     const y = doc.y;
-    const gap = 15;
-    const cardWidth = 155;
+    const gap = 20;
+    const cardWidth = 210;
     const cardHeight = 120;
+
+    const totalWidth = cardWidth * 2 + gap;
+    const startX = (pageWidth - totalWidth) / 2;
 
     const mediaMinutos = totalAtividades > 0 ? totalMinutos / totalAtividades : 0;
 
     drawCard(doc, startX, y, cardWidth, cardHeight);
     drawCard(doc, startX + cardWidth + gap, y, cardWidth, cardHeight);
-    drawCard(doc, startX + (cardWidth + gap) * 2, y, cardWidth, cardHeight);
 
-    // Card 1 - Período de Faturamento
     doc
         .fillColor("#0F172A")
         .font("Helvetica-Bold")
         .fontSize(11)
-        .text("Período de Faturamento", startX + 15, y + 18);
+        .text("Período de Faturamento", startX + 18, y + 18);
 
     doc
         .fillColor("#334155")
         .font("Helvetica")
         .fontSize(10)
-        .text(getPeriodo(invoice.createdTime), startX + 15, y + 48)
-        .text(`Emissão: ${new Date(invoice.createdTime).toLocaleDateString("pt-BR")}`, startX + 15, y + 70);
+        .text(getPeriodo(invoice.createdTime), startX + 18, y + 48)
+        .text(
+            `Emissão: ${new Date(invoice.createdTime).toLocaleDateString("pt-BR")}`,
+            startX + 18,
+            y + 70
+        );
 
-    // Card 2 - Atividades - CORRIGIDO: posições Y mais para baixo
     const card2X = startX + cardWidth + gap;
 
     doc
         .fillColor("#0F172A")
         .font("Helvetica-Bold")
         .fontSize(11)
-        .text("Atividades", card2X + 15, y + 18);
+        .text("Atividades", card2X + 18, y + 18);
 
-    // Ajustado: começando em y + 50 (mais para baixo)
     doc
         .fillColor("#1E293B")
         .font("Helvetica-Bold")
         .fontSize(16)
-        .text(`${totalAtividades}`, card2X + 15, y + 50, { continued: true })
+        .text(`${totalAtividades}`, card2X + 18, y + 50, { continued: true })
         .font("Helvetica")
         .fontSize(10)
         .fillColor("#475569")
@@ -150,7 +142,7 @@ function drawSummaryCards(doc, invoice, totalMinutos, totalAtividades, valorDocu
         .fillColor("#1E293B")
         .font("Helvetica-Bold")
         .fontSize(16)
-        .text(`${formatHoursNumber(mediaMinutos)} h`, card2X + 15, y + 72, { continued: true })
+        .text(`${formatHoursNumber(mediaMinutos)} h`, card2X + 18, y + 72, { continued: true })
         .font("Helvetica")
         .fontSize(10)
         .fillColor("#475569")
@@ -160,32 +152,11 @@ function drawSummaryCards(doc, invoice, totalMinutos, totalAtividades, valorDocu
         .fillColor("#1E293B")
         .font("Helvetica-Bold")
         .fontSize(16)
-        .text(`${formatHoursNumber(totalMinutos)} h`, card2X + 15, y + 94, { continued: true })
+        .text(`${formatHoursNumber(totalMinutos)} h`, card2X + 18, y + 94, { continued: true })
         .font("Helvetica")
         .fontSize(10)
         .fillColor("#475569")
         .text(" total de horas");
-
-    // Card 3 - A receber
-    const card3X = startX + (cardWidth + gap) * 2;
-
-    doc
-        .fillColor("#0F172A")
-        .font("Helvetica-Bold")
-        .fontSize(11)
-        .text("A receber", card3X + 15, y + 18);
-
-    doc
-        .fillColor("#0F766E")
-        .font("Helvetica-Bold")
-        .fontSize(22)
-        .text(formatMoney(valorDocumento), card3X + 15, y + 52);
-
-    doc
-        .fillColor("#475569")
-        .font("Helvetica")
-        .fontSize(10)
-        .text("Valor do documento", card3X + 15, y + 86);
 
     doc.y = y + cardHeight + 25;
 }
@@ -206,7 +177,6 @@ function drawTableHeader(doc, y, primaryColor) {
 
     return y + 40;
 }
-
 
 function drawRow(doc, item, y, index) {
     const rowHeight = 54;
@@ -237,7 +207,7 @@ function drawRow(doc, item, y, index) {
             width: 70,
             align: "center",
             ellipsis: true
-        })
+        });
 
     doc
         .text(`${item.tempo || 0} min`, 465, y + 18, {
@@ -248,7 +218,6 @@ function drawRow(doc, item, y, index) {
 
     return y + rowHeight + 10;
 }
-
 
 function drawTotalFooter(doc, y, totalMinutos) {
     doc
@@ -272,7 +241,6 @@ function drawTotalFooter(doc, y, totalMinutos) {
 
     return y + 50;
 }
-
 
 function drawObservacoes(doc, y, valorDocumento) {
     doc
@@ -306,7 +274,6 @@ function drawObservacoes(doc, y, valorDocumento) {
         );
 }
 
-
 module.exports = async function generateReportHoursPdf({
     invoice,
     empresaNome,
@@ -325,7 +292,8 @@ module.exports = async function generateReportHoursPdf({
     doc.on("data", chunk => buffers.push(chunk));
 
     drawHeader(doc, empresaNome, primaryColor, invoice.id);
-    drawSummaryCards(doc, invoice, totalMinutos, totalAtividades, valorDocumento);
+
+    drawSummaryCards(doc, invoice, totalMinutos, totalAtividades);
 
     let currentY = drawTableHeader(doc, doc.y, primaryColor);
 

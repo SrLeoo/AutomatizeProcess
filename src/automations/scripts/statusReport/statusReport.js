@@ -4,7 +4,7 @@ const getInvoice = require("../../../services/bitrix/invoice/getInvoice");
 const getDeal = require("../../../services/bitrix/deal/getDeal");
 const getCompany = require("../../../services/bitrix/company/getCompany");
 
-const generateReportHoursPdf = require("./template");
+const generateReportHoursPdf = require("./finance/template");
 
 function formatDate(date) {
     if (!date) return "-";
@@ -17,7 +17,6 @@ function formatDate(date) {
 
     return d.toLocaleDateString("pt-BR");
 }
-
 
 function isValidHexColor(color) {
     return /^#[0-9A-Fa-f]{6}$/.test(String(color || "").trim());
@@ -64,7 +63,7 @@ module.exports = async function statusReport(invoiceId) {
             "Empresa";
 
         const primaryColor = getPrimaryColor(invoice.corPdf);
-        
+
         const valorDocumento = Number(invoice.opportunity || 0);
 
         let negocios = invoice.negocios || [];
