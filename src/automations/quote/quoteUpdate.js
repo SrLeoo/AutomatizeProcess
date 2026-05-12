@@ -3,6 +3,7 @@ const sendNotification = require('../../automations/geral/notifications');
 const getCompany = require("../../services/bitrix/company/getCompany");
 const getQuote = require("../../services/bitrix/quote/getQuote");
 const currentTime = require('../../automations/geral/currentTime');
+const { map } = require("pdfkit");
 
 module.exports = async function quoteUpdate(body) {
     const quoteId = body?.data?.FIELDS?.ID;
@@ -39,6 +40,10 @@ module.exports = async function quoteUpdate(body) {
 
     if (mapQuote.status_id === "SENT" && !mapQuote.devolutivaFeita) {
         fieldToUpdate = "UF_CRM_QUOTE_1774540686"; // Devolutiva feita
+    }
+
+    if (mapQuote.status_id === "UC_7J5V2S" && !mapQuote.analiseContrato) {
+        fieldToUpdate = "UF_CRM_QUOTE_1778556833"; // Análise de contrato
     }
 
     if (mapQuote.status_id === "UC_34LZB3" && !mapQuote.aguardandoAssinatura) {
