@@ -53,7 +53,7 @@ module.exports = function router(body) {
     case "ONCRMQUOTEUPDATE":
       quoteUpdate(body);
       break;
-      
+
     case "ONCRMQUOTEDELETE":
       quoteDelete(body);
       break;
