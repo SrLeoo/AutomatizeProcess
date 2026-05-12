@@ -13,7 +13,8 @@ module.exports = async function quoteAdd(body) {
         await axios.post(`${process.env.BITRIX_WEBHOOK}crm.quote.update`, {
             id: quoteId,
             fields: {
-                UF_CRM_QUOTE_1774540648: currentTime()
+                UF_CRM_QUOTE_1774540648: currentTime(),
+                UF_CRM_1773953986: currentTime()
             }
         });
     }
