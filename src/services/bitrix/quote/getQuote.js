@@ -17,6 +17,7 @@ module.exports = function getQuote(quoteId) {
                 // Entrada na fase
                 aguardandoRetorno: quoteData.UF_CRM_QUOTE_1774540648, // Aguardando retorno
                 devolutivaFeita: quoteData.UF_CRM_QUOTE_1774540686, // Devolutiva feita
+                analiseContrato: quoteData.UF_CRM_QUOTE_1778556833, // Análise de contrato
                 aguardandoAssinatura: quoteData.UF_CRM_QUOTE_1774540703, // Aguardando assinatura
                 recusado: quoteData.UF_CRM_QUOTE_1774540714, // Recusado
                 aceito: quoteData.UF_CRM_QUOTE_1774540734,   // Aceito
